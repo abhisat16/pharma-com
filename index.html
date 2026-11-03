@@ -1221,13 +1221,14 @@ function encodeWav(chunks,inRate){
 }
 const silentWav=()=>encodeWav([new Float32Array(16000)],16000).blob;
 function sarvamError(status,body){
-  const code=(body&&body.error&&body.error.code)||'';
-  if(status===403||code==='invalid_api_key_error'||code==='authentication_error') return 'Sarvam rejected the key. Check Settings.';
-  if(code==='insufficient_quota_error') return 'Sarvam credits are used up.';
-  if(status===429) return 'Sarvam is busy. Try again.';
+  const er=(body&&body.error)||{}; const code=er.code||''; const msg=(er.message||'').slice(0,140);
+  if(code==='insufficient_quota_error') return 'Sarvam credits are used up. Add credit in dashboard.sarvam.ai.';
+  if(code==='invalid_api_key_error'||code==='authentication_error') return 'Sarvam says this key is invalid (invalid_api_key_error). Use the API subscription key from dashboard.sarvam.ai → API Keys, not the Samvaad agent key.';
+  if(status===429||code==='rate_limit_exceeded_error') return 'Sarvam is busy. Try again.';
   if(status===503&&code==='NOT_CONFIGURED') return 'No Sarvam key on the server yet.';
-  return `Sarvam error ${status}${code?' ('+code+')':''}.`;
+  return `Sarvam error ${status}${code?' · '+code:''}${msg?' · '+msg:''}`;
 }
+const cleanKey=k=>String(k||'').trim().replace(/^bearer\s+/i,'').replace(/^["'`]+|["'`]+$/g,'').trim();
 async function sarvamSTT(blob,minimal){
   const fd=new FormData();
   fd.append('file',blob,'command.wav'); fd.append('model',SARVAM_MODEL); fd.append('language_code',LANGS[SET.lang].code);
@@ -1275,7 +1276,7 @@ async function stopListening(){
   let text='',engine='',lang='',err='';
   if(sarvamAvailable()&&wav.seconds>0.4){
     try{ const g=await sarvamSTT(wav.blob); text=g.text; lang=g.lang; engine='Sarvam'; if(SET.key&&SET.keyState!=='ok'){SET.keyState='ok';saveSet();renderEngine();} }
-    catch(e){ err=e.message; if(SET.key&&e.status===403){ SET.keyState='bad'; saveSet(); renderEngine(); } }
+    catch(e){ err=e.message; if(SET.key&&(e.code==='invalid_api_key_error'||e.code==='authentication_error')){ SET.keyState='bad'; saveSet(); renderEngine(); } }
   }
   const browser=(r.browserText+' '+(r.interim||'')).trim();
   if(!text&&browser){ text=browser; engine='Browser speech'; lang=LANGS[SET.lang].sr; }
@@ -1346,13 +1347,16 @@ function openSettings(){
   const vn=$('#voiceNote'); vn.hidden=!IN_ARTIFACT; vn.textContent='Shared links can’t use the mic. Open Pharma-com.html in Chrome for voice.';
   $('#setModal').hidden=false; $('#setKey').focus();
 }
-function saveSettings(){ const k=$('#setKey').value.trim(); if(k!==SET.key) SET.keyState=''; SET.key=k; SET.useVoice=$('#setVoice').checked; SET.speak=$('#setSpeak').checked; SET.autoPrint=$('#setPrint').checked; SET.agent={key:$('#agKey').value.trim(),app:$('#agApp').value.trim(),org:$('#agOrg').value.trim(),ws:$('#agWs').value.trim()}; saveSet(); renderEngine(); renderAgentBtn(); }
+function saveSettings(){ const k=cleanKey($('#setKey').value); $('#setKey').value=k; if(k!==SET.key) SET.keyState=''; SET.key=k; SET.useVoice=$('#setVoice').checked; SET.speak=$('#setSpeak').checked; SET.autoPrint=$('#setPrint').checked; SET.agent={key:cleanKey($('#agKey').value),app:$('#agApp').value.trim(),org:$('#agOrg').value.trim(),ws:$('#agWs').value.trim()}; saveSet(); renderEngine(); renderAgentBtn(); }
 async function testKey(){
   saveSettings(); const st=$('#keyStatus');
   if(!SET.key&&!SERVER_READY){ st.textContent='Paste a key first.'; return; }
   st.textContent='Testing…';
-  try{ await sarvamSTT(silentWav(),true); if(SET.key) SET.keyState='ok'; st.textContent='Connected to Sarvam.'; }
-  catch(e){ if(SET.key&&e.status===403) SET.keyState='bad'; st.textContent=e.message; }
+  try{ await sarvamSTT(silentWav(),true); if(SET.key) SET.keyState='ok'; st.textContent='Connected to Sarvam. Key works.'; }
+  catch(e){
+    if(e.status===400||e.status===422){ if(SET.key) SET.keyState='ok'; st.textContent='Key accepted by Sarvam.'; }
+    else { if(SET.key&&(e.code==='invalid_api_key_error'||e.code==='authentication_error')) SET.keyState='bad'; st.textContent=e.message; }
+  }
   saveSet(); renderEngine();
 }
 
