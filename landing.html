@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharma.com</title>
+<meta name="description" content="Voice billing and stock for India's pharmacies. Goli bolo, bill lo.">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Telugu:wght@500&display=swap">
+<style>
+/* Layout: chemist-green hero with a live "speech → slip" moment, then problem, steps, features, tech, roadmap. */
+:root{
+  --paper:#EEF2EF; --surface:#FFFFFF; --ink:#0F1F1A; --muted:#566962; --line:#D5DFD9;
+  --brand:#0B6A55; --brand-2:#0D8269; --station:#0A4A3C; --station-2:#0F5E4C; --station-ink:#F2FBF7; --station-muted:#9CC9B9;
+  --signal:#F0613A; --slip:#FFFEF8; --slip-ink:#1C1C1A; --slip-muted:#75736B; --slip-rule:#D2CFC3; --bad:#B42318; --warn:#94600A; --ok:#1B7A47;
+  --display:"Bricolage Grotesque","Noto Sans",system-ui,sans-serif;
+  --body:"Noto Sans","Noto Sans Devanagari","Noto Sans Kannada","Noto Sans Telugu",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;color-scheme:dark}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:17px/1.6 var(--body)}
+a{color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
+.btn{display:inline-flex;align-items:center;gap:10px;border-radius:14px;padding:14px 22px;font-weight:700;text-decoration:none;font-size:16px}
+.btn.primary{background:var(--signal);color:#fff}
+.btn.primary:hover{filter:brightness(1.06)}
+.btn.ghost{border:1.5px solid rgba(255,255,255,.35);color:var(--station-ink)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--brand)}
+
+/* hero */
+.hero{background:radial-gradient(110% 80% at 70% 0%,var(--station-2),var(--station) 65%);color:var(--station-ink);padding-block:20px 72px;overflow:hidden}
+.nav{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:6px 40px}
+.logo{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:21px;text-decoration:none}
+.logo svg{width:34px;height:34px}
+.nav .btn{padding:10px 16px;font-size:14px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
+@media (max-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
+.hero h1{font-size:clamp(46px,7.4vw,92px);line-height:.95;font-weight:800}
+.hero h1 span{color:var(--signal)}
+.hero .lede{font-size:clamp(18px,2vw,21px);max-width:34ch;color:var(--station-muted);margin:22px 0 30px}
+.hero .lede b{color:var(--station-ink)}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.langs{display:flex;gap:8px;flex-wrap:wrap;margin-top:30px}
+.langs span{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--station-muted)}
+
+/* hero visual: speech → slip */
+.demo{position:relative;display:flex;flex-direction:column;gap:14px;max-width:440px;justify-self:center;width:100%}
+.say{align-self:flex-start;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);border-radius:20px 20px 20px 6px;padding:14px 18px;font-size:19px;line-height:1.45;max-width:100%}
+.say small{display:flex;align-items:center;gap:8px;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--station-muted);font-weight:700;margin-bottom:4px}
+.say small i{width:8px;height:8px;border-radius:50%;background:var(--signal);animation:blink 1.2s infinite}
+@keyframes blink{50%{opacity:.3}}
+.slip{background:var(--slip);color:var(--slip-ink);font-family:var(--mono);font-size:13px;padding:18px 20px 26px;border-radius:6px 6px 0 0;box-shadow:0 24px 40px -24px rgba(0,0,0,.6);
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - 9px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/18px 9px repeat-x;
+  mask:linear-gradient(#000 0 0) top/100% calc(100% - 9px) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/18px 9px repeat-x}
+.slip .hd{text-align:center;border-bottom:1px dashed var(--slip-rule);padding-bottom:8px;margin-bottom:8px}
+.slip .hd b{font-family:var(--display);font-size:15px;display:block}
+.slip .hd span{font-size:11px;color:var(--slip-muted)}
+.slip .row{display:flex;justify-content:space-between;gap:10px}
+.slip .pt{font-family:var(--display);font-size:20px;font-weight:700;display:flex;justify-content:space-between;margin:4px 0 8px}
+.slip .meta{font-size:11px;color:var(--slip-muted);margin-bottom:8px}
+.slip .tot{display:flex;justify-content:space-between;align-items:baseline;border-top:1px dashed var(--slip-rule);padding-top:8px;margin-top:4px;color:var(--slip-muted);font-size:12px;letter-spacing:.1em}
+.slip .tot b{font-family:var(--display);font-size:26px;color:var(--slip-ink);letter-spacing:-.01em}
+.slip .speed{margin-top:12px;background:#DDF1E4;color:var(--ok);border-radius:10px;text-align:center;padding:7px;font-family:var(--body);font-weight:700;font-size:13px}
+
+/* sections */
+section.block{padding-block:84px}
+.head{display:flex;flex-direction:column;gap:10px;max-width:720px;margin-bottom:40px}
+.head h2{font-size:clamp(32px,4.4vw,52px);line-height:1.05;font-weight:800}
+.head p{margin:0;color:var(--muted);font-size:18px;max-width:60ch}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:800px){.stats{grid-template-columns:minmax(0,1fr)}}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px}
+.stat b{display:block;font-family:var(--display);font-size:48px;line-height:1;font-weight:800;letter-spacing:-.03em}
+.stat b.red{color:var(--bad)} .stat b.green{color:var(--brand)}
+.stat p{margin:10px 0 0;color:var(--muted);font-size:15.5px}
+.stat small{display:block;margin-top:10px;font-size:12px;color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:s}
+@media (max-width:800px){.steps{grid-template-columns:minmax(0,1fr)}}
+.step{border-top:3px solid var(--ink);padding-top:18px}
+.step b{font-family:var(--mono);font-size:13px;color:var(--brand)}
+.step h3{font-size:26px;margin:6px 0 8px}
+.step p{margin:0;color:var(--muted)}
+.step q{display:block;margin-top:14px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;quotes:none;color:var(--ink)}
+.features{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-radius:20px;overflow:hidden}
+@media (max-width:900px){.features{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.features{grid-template-columns:minmax(0,1fr)}}
+.feat{background:var(--surface);padding:24px}
+.feat h3{font-size:19px;margin-bottom:6px}
+.feat p{margin:0;color:var(--muted);font-size:15.5px}
+.feat .ic{width:36px;height:36px;border-radius:10px;background:var(--paper);display:grid;place-items:center;margin-bottom:14px;color:var(--brand)}
+.feat .ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dark{background:var(--station);color:var(--station-ink)}
+.dark .eyebrow{color:var(--station-muted)}
+.dark .head p{color:var(--station-muted)}
+.stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:800px){.stack{grid-template-columns:minmax(0,1fr)}}
+.tech{border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:24px;background:rgba(255,255,255,.04)}
+.tech span{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--station-muted);font-weight:700}
+.tech h3{font-size:22px;margin:6px 0 8px}
+.tech p{margin:0;color:var(--station-muted);font-size:15.5px}
+.road{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.road{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:520px){.road{grid-template-columns:minmax(0,1fr)}}
+.road div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
+.road b{font-family:var(--mono);font-size:12px;color:var(--brand);letter-spacing:.06em}
+.road h3{font-size:18px;margin:6px 0 4px}
+.road p{margin:0;color:var(--muted);font-size:15px}
+.cta{text-align:center;padding-block:90px;background:var(--station);color:var(--station-ink)}
+.cta h2{font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1}
+.cta h2 span{color:var(--signal)}
+.cta p{color:var(--station-muted);margin:16px auto 28px;max-width:46ch}
+footer{padding-block:28px;font-size:13.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media (prefers-reduced-motion:reduce){*{animation:none!important}}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <nav class="nav">
+      <a class="logo" href="./landing.html"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#F2FBF7"/><path d="M16 9h8v7h7v8h-7v7h-8v-7H9v-8h7z" fill="#0A4A3C"/><circle cx="31" cy="31" r="6" fill="#F0613A"/></svg>Pharma.com</a>
+      <a class="btn primary" href="./">Open the live counter →</a>
+    </nav>
+    <div class="hero-grid">
+      <div>
+        <h1>Goli bolo,<br><span>bill lo.</span></h1>
+        <p class="lede">Voice billing and stock for India's pharmacies. Say the patient, the medicine and the quantity. <b>The bill is ready before the strip reaches the counter.</b></p>
+        <div class="ctas"><a class="btn primary" href="./">Try it live</a><a class="btn ghost" href="#how">How it works</a></div>
+        <div class="langs"><span>हिंदी</span><span>English</span><span>मराठी</span><span>ಕನ್ನಡ</span><span>తెలుగు</span></div>
+      </div>
+      <div class="demo" aria-label="Example: a spoken command turns into a bill">
+        <div class="say"><small><i></i>Pharmacist says</small>अभिजीत, 16 साल, Dolo 650 की 10 स्ट्रिप का बिल बनाओ</div>
+        <div class="slip">
+          <div class="hd"><b>Shree Sai Medicals</b><span>Tax invoice · demo</span></div>
+          <div class="pt"><span>Abhijeet</span><span>16</span></div>
+          <div class="row"><b>Dolo 650</b><b>336.00</b></div>
+          <div class="meta">10 strips × 33.60 · Rack A1 · Exp 08/27 · in stock</div>
+          <div class="tot"><span>TOTAL</span><b>₹336.00</b></div>
+          <div class="speed">Confirmed with “haan” · billed in 9 s</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<section class="block">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">The problem</span><h2>The counter is the bottleneck.</h2><p>Today a pharmacist checks the shelf, types the medicine into billing software, types the patient details, then prints. One patient, one medicine, several minutes, while the queue grows.</p></div>
+    <div class="stats">
+      <div class="stat"><b class="red">5–10 min</b><p>to check stock and bill one patient by hand.</p><small>Observed at retail counters</small></div>
+      <div class="stat"><b>~12 lakh</b><p>retail pharmacies in India, most run by one or two people at the counter.</p><small><a href="https://www.etvbharat.com/en/health/pharmacies-across-india-shut-may-20-epharmacy-concerns-enn26051305103">ETV Bharat, May 2026</a></small></div>
+      <div class="stat"><b class="green">&lt; 15 s</b><p>from spoken command to confirmed bill with Pharma.com in our demo.</p><small>Prototype, demo store data</small></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" id="how" style="padding-top:0">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">How it works</span><h2>Speak. Check. Say “haan”.</h2></div>
+    <div class="steps">
+      <div class="step"><b>01</b><h3>Speak</h3><p>Name, age, medicine, quantity. Any order, any of five languages, mixed if you like.</p><q>“Pan-D 2 strip aur Cetzine 5 goli, Rahul 30 saal”</q></div>
+      <div class="step"><b>02</b><h3>Check</h3><p>The bill appears with stock, rack, batch and expiry. Out of stock or expired? It offers the same salt.</p><q>Crocin out of stock → Calpol 500 · same salt</q></div>
+      <div class="step"><b>03</b><h3>Confirm</h3><p>Say “haan”, “ho”, “haudu” or “avunu”. The bill prints and stock updates on its own.</p><q>Billed in 9 s · Dolo 650 now 38 strips</q></div>
+    </div>
+  </div>
+</section>
+
+<section class="block" style="padding-top:0">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">What the owner gets</span><h2>Billing, stock and expiry in one voice.</h2></div>
+    <div class="features">
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div><h3>Five Indian languages</h3><p>Hindi, English, Marathi, Kannada, Telugu. Numbers spoken as words work too.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7"/></svg></div><h3>Live stock</h3><p>“Dolo 650 stock mein hai?” answers with quantity and rack. “20 strip add karo” restocks.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><h3>Expiry first</h3><p>Stock sorted by expiry. Filter 30 days to 1 year. Expired stock is blocked at billing.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div><h3>Owner dashboard</h3><p>Sales, top sellers and a “sell first” list of stock about to expire, with its value.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M12 3l8 4v5c0 5-3.5 8-8 9-4.5-1-8-4-8-9V7z"/></svg></div><h3>Safer dispensing</h3><p>Rx (Schedule H) flags, same-salt substitutes, short-stock warnings before you confirm.</p></div>
+      <div class="feat"><div class="ic"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6"/></svg></div><h3>Proper invoices</h3><p>GST-style bill with batch and expiry per line. Every bill and voice command is logged.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block dark">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">Built on Indian voice AI</span><h2>Powered by Sarvam.</h2><p>Speech that understands how Indian pharmacists actually talk, brand names and all.</p></div>
+    <div class="stack">
+      <div class="tech"><span>Speech-to-text</span><h3>Sarvam Saaras</h3><p>Turns the pharmacist's voice into text in 22+ Indian languages, primed with the store's medicine names.</p></div>
+      <div class="tech"><span>Voice agent</span><h3>Sarvam Samvaad</h3><p>A conversational agent that talks back to the customer, while Pharma.com drafts the bill from what is said.</p></div>
+      <div class="tech"><span>Always on</span><h3>Offline-safe fallback</h3><p>If the network drops, the browser's own speech and typed commands keep the counter running.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="block">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">What comes next</span><h2>From prototype to every counter.</h2></div>
+    <div class="road">
+      <div><b>NOW</b><h3>Working prototype</h3><p>Voice billing, stock, expiry and dashboard, live on the web.</p></div>
+      <div><b>NEXT</b><h3>Pilot in 5 stores</h3><p>Bengaluru chemists, real catalogue, time-per-bill measured.</p></div>
+      <div><b>THEN</b><h3>Scan + prescription</h3><p>Barcode batch scan and prescription photo to line items.</p></div>
+      <div><b>LATER</b><h3>Reorder & GST</h3><p>Distributor orders from reorder alerts, GST return export.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="cta">
+  <div class="wrap">
+    <h2>Goli bolo, <span>bill lo.</span></h2>
+    <p>Open the counter in Chrome, tap the mic and say a bill. Demo store and medicines included.</p>
+    <a class="btn primary" href="./">Open the live counter →</a>
+  </div>
+</section>
+
+<div class="wrap"><footer><span>Pharma.com · built by Dr. Abhijeet Satapathy, AI &amp; Data Science, IIHMR Bangalore</span><span>Prototype. Store, medicines and prices are demo data.</span></footer></div>
+</body>
+</html>
