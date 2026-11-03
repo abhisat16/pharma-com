@@ -4,20 +4,20 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pharma.com</title>
-<meta name="description" content="Voice billing and stock for India's pharmacies. Goli bolo, bill lo.">
+<meta name="description" content="Enterprise voice billing and inventory for pharmacy chains. Goli bolo Aur bill le lo.">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@500&family=Noto+Sans+Telugu:wght@500&display=swap">
 <style>
 /* Layout: chemist-green hero with a live "speech → slip" moment, then problem, steps, features, tech, roadmap. */
 :root{
   --paper:#EEF2EF; --surface:#FFFFFF; --ink:#0F1F1A; --muted:#566962; --line:#D5DFD9;
   --brand:#0B6A55; --brand-2:#0D8269; --station:#0A4A3C; --station-2:#0F5E4C; --station-ink:#F2FBF7; --station-muted:#9CC9B9;
-  --signal:#F0613A; --slip:#FFFEF8; --slip-ink:#1C1C1A; --slip-muted:#75736B; --slip-rule:#D2CFC3; --bad:#B42318; --warn:#94600A; --ok:#1B7A47;
+  --signal:#F0613A; --sky:#4CC9F0; --sky-ink:#0369A1; --sky-deep:#062F3F; --slip:#FFFEF8; --slip-ink:#1C1C1A; --slip-muted:#75736B; --slip-rule:#D2CFC3; --bad:#B42318; --warn:#94600A; --ok:#1B7A47;
   --display:"Bricolage Grotesque","Noto Sans",system-ui,sans-serif;
   --body:"Noto Sans","Noto Sans Devanagari","Noto Sans Kannada","Noto Sans Telugu",system-ui,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
 }
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;color-scheme:dark}}
-:root[data-theme="dark"]{--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;color-scheme:dark}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;--sky-ink:#4CC9F0;color-scheme:dark}}
+:root[data-theme="dark"]{--paper:#0B1411;--surface:#121E1A;--ink:#E2ECE8;--muted:#93A79F;--line:#22322D;--brand:#2FB58F;--brand-2:#4CC7A3;--station:#0E3A30;--station-2:#134A3D;--sky-ink:#4CC9F0;color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--paper);color:var(--ink);font:17px/1.6 var(--body)}
@@ -25,10 +25,10 @@ a{color:inherit}
 .wrap{max-width:1180px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
 h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:balance}
 .btn{display:inline-flex;align-items:center;gap:10px;border-radius:14px;padding:14px 22px;font-weight:700;text-decoration:none;font-size:16px}
-.btn.primary{background:var(--signal);color:#fff}
+.btn.primary{background:var(--sky);color:var(--sky-deep)}
 .btn.primary:hover{filter:brightness(1.06)}
 .btn.ghost{border:1.5px solid rgba(255,255,255,.35);color:var(--station-ink)}
-.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--brand)}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--sky-ink)}
 
 /* hero */
 .hero{background:radial-gradient(110% 80% at 70% 0%,var(--station-2),var(--station) 65%);color:var(--station-ink);padding-block:20px 72px;overflow:hidden}
@@ -39,9 +39,11 @@ h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.02em;text-wrap:bal
 .hero-grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr);gap:48px;align-items:center}
 @media (max-width:900px){.hero-grid{grid-template-columns:minmax(0,1fr)}}
 .hero h1{font-size:clamp(46px,7.4vw,92px);line-height:.95;font-weight:800}
-.hero h1 span{color:var(--signal)}
+.hero h1{color:var(--sky)}
+.hero h1 span{color:#fff}
 .hero .lede{font-size:clamp(18px,2vw,21px);max-width:34ch;color:var(--station-muted);margin:22px 0 30px}
 .hero .lede b{color:var(--station-ink)}
+.kicker{display:inline-block;margin:0 0 18px;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--sky);border:1px solid rgba(76,201,240,.4);border-radius:999px;padding:5px 14px}
 .ctas{display:flex;gap:12px;flex-wrap:wrap}
 .langs{display:flex;gap:8px;flex-wrap:wrap;margin-top:30px}
 .langs span{border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:4px 12px;font-size:14px;color:var(--station-muted)}
@@ -74,13 +76,13 @@ section.block{padding-block:84px}
 @media (max-width:800px){.stats{grid-template-columns:minmax(0,1fr)}}
 .stat{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px}
 .stat b{display:block;font-family:var(--display);font-size:48px;line-height:1;font-weight:800;letter-spacing:-.03em}
-.stat b.red{color:var(--bad)} .stat b.green{color:var(--brand)}
+.stat b.red{color:var(--bad)} .stat b.green{color:var(--sky-ink)}
 .stat p{margin:10px 0 0;color:var(--muted);font-size:15.5px}
 .stat small{display:block;margin-top:10px;font-size:12px;color:var(--muted)}
 .steps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;counter-reset:s}
 @media (max-width:800px){.steps{grid-template-columns:minmax(0,1fr)}}
 .step{border-top:3px solid var(--ink);padding-top:18px}
-.step b{font-family:var(--mono);font-size:13px;color:var(--brand)}
+.step b{font-family:var(--mono);font-size:13px;color:var(--sky-ink)}
 .step h3{font-size:26px;margin:6px 0 8px}
 .step p{margin:0;color:var(--muted)}
 .step q{display:block;margin-top:14px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 14px;quotes:none;color:var(--ink)}
@@ -90,10 +92,10 @@ section.block{padding-block:84px}
 .feat{background:var(--surface);padding:24px}
 .feat h3{font-size:19px;margin-bottom:6px}
 .feat p{margin:0;color:var(--muted);font-size:15.5px}
-.feat .ic{width:36px;height:36px;border-radius:10px;background:var(--paper);display:grid;place-items:center;margin-bottom:14px;color:var(--brand)}
+.feat .ic{width:36px;height:36px;border-radius:10px;background:var(--paper);display:grid;place-items:center;margin-bottom:14px;color:var(--sky-ink)}
 .feat .ic svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .dark{background:var(--station);color:var(--station-ink)}
-.dark .eyebrow{color:var(--station-muted)}
+.dark .eyebrow{color:var(--sky)}
 .dark .head p{color:var(--station-muted)}
 .stack{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
 @media (max-width:800px){.stack{grid-template-columns:minmax(0,1fr)}}
@@ -105,12 +107,26 @@ section.block{padding-block:84px}
 @media (max-width:900px){.road{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:520px){.road{grid-template-columns:minmax(0,1fr)}}
 .road div{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:20px}
-.road b{font-family:var(--mono);font-size:12px;color:var(--brand);letter-spacing:.06em}
+.road b{font-family:var(--mono);font-size:12px;color:var(--sky-ink);letter-spacing:.06em}
 .road h3{font-size:18px;margin:6px 0 4px}
 .road p{margin:0;color:var(--muted);font-size:15px}
+.ent{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+@media (max-width:900px){.ent{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.ent{grid-template-columns:minmax(0,1fr)}}
+.ent div{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:22px;display:flex;flex-direction:column;gap:8px}
+.ent h3{font-size:19px}
+.ent p{margin:0;color:var(--muted);font-size:15.5px;flex:1}
+.tag{align-self:flex-start;font-size:11.5px;font-weight:700;border-radius:999px;padding:3px 10px}
+.tag.live{background:#DDF1E4;color:#1B7A47}
+.tag.plan{background:#E0F2FE;color:#0369A1}
+.impact{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:16px;background:var(--sky-deep);border-radius:20px;padding:28px}
+@media (max-width:700px){.impact{grid-template-columns:minmax(0,1fr)}}
+.impact b{display:block;font-family:var(--display);font-size:48px;font-weight:800;color:var(--sky);line-height:1}
+.impact span{color:#BFE6F5;font-size:15px}
 .cta{text-align:center;padding-block:90px;background:var(--station);color:var(--station-ink)}
 .cta h2{font-size:clamp(40px,6vw,72px);font-weight:800;line-height:1}
-.cta h2 span{color:var(--signal)}
+.cta h2{color:var(--sky)}
+.cta h2 span{color:#fff}
 .cta p{color:var(--station-muted);margin:16px auto 28px;max-width:46ch}
 footer{padding-block:28px;font-size:13.5px;color:var(--muted);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 @media (prefers-reduced-motion:reduce){*{animation:none!important}}
@@ -122,12 +138,13 @@ footer{padding-block:28px;font-size:13.5px;color:var(--muted);display:flex;justi
   <div class="wrap">
     <nav class="nav">
       <a class="logo" href="./landing.html"><svg viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="#F2FBF7"/><path d="M16 9h8v7h7v8h-7v7h-8v-7H9v-8h7z" fill="#0A4A3C"/><circle cx="31" cy="31" r="6" fill="#F0613A"/></svg>Pharma.com</a>
-      <a class="btn primary" href="./">Open the live counter →</a>
+      <a class="btn primary" href="#enterprise">Book a pilot</a>
     </nav>
     <div class="hero-grid">
       <div>
-        <h1>Goli bolo,<br><span>bill lo.</span></h1>
-        <p class="lede">Voice billing and stock for India's pharmacies. Say the patient, the medicine and the quantity. <b>The bill is ready before the strip reaches the counter.</b></p>
+        <p class="kicker">Voice AI for pharmacy chains, hospital pharmacies and distributors</p>
+        <h1>Goli bolo<br><span>Aur bill le lo.</span></h1>
+        <p class="lede">Enterprise voice billing and inventory in five Indian languages. Your pharmacists speak; <b>the bill, the stock ledger and the expiry register update themselves.</b></p>
         <div class="ctas"><a class="btn primary" href="https://indus.sarvam.ai/samvaad/build/update-agent/Conversatio-5525ad21-939f" target="_blank" rel="noopener">Try it live</a><a class="btn ghost" href="./">Open the counter</a></div>
         <div class="langs"><span>हिंदी</span><span>English</span><span>मराठी</span><span>ಕನ್ನಡ</span><span>తెలుగు</span></div>
       </div>
@@ -193,22 +210,41 @@ footer{padding-block:28px;font-size:13.5px;color:var(--muted);display:flex;justi
   </div>
 </section>
 
+<section class="block" id="enterprise" style="padding-top:0">
+  <div class="wrap">
+    <div class="head"><span class="eyebrow">Built for enterprise</span><h2>One voice layer across every counter.</h2><p>Designed for multi-store chains and hospital pharmacies that need speed at the counter and control at head office.</p></div>
+    <div class="ent">
+      <div><h3>Multi-store control</h3><p>One dashboard for sales, top sellers, stock-outs and expiry risk across every branch.</p><span class="tag live">In prototype · single store</span></div>
+      <div><h3>Compliance by default</h3><p>Schedule H flags, batch and expiry on every invoice, expired stock blocked at billing, full voice and bill audit log.</p><span class="tag live">In prototype</span></div>
+      <div><h3>Roles and access</h3><p>Separate rights for pharmacist, store manager and head office. Every action tied to a user.</p><span class="tag plan">Pilot phase</span></div>
+      <div><h3>ERP and distributor integration</h3><p>Sync item masters, purchase orders and GST data with the pharmacy ERP and distributors you already use.</p><span class="tag plan">Pilot phase</span></div>
+      <div><h3>Indian voice AI</h3><p>Sarvam speech models built for Indian languages and accents, tuned to each store's medicine catalogue.</p><span class="tag live">Live</span></div>
+      <div><h3>Keys on the server</h3><p>Speech keys stay server-side behind a proxy, never in the browser, ready for private cloud deployment.</p><span class="tag live">Built</span></div>
+    </div>
+    <div class="impact">
+      <div><b>90%+</b><span>less time per bill (≈5 min manual vs &lt;15 s in demo)</span></div>
+      <div><b>0</b><span>expired strips billed: blocked at the counter</span></div>
+      <div><b>5</b><span>Indian languages on day one</span></div>
+    </div>
+  </div>
+</section>
+
 <section class="block">
   <div class="wrap">
     <div class="head"><span class="eyebrow">What comes next</span><h2>From prototype to every counter.</h2></div>
     <div class="road">
       <div><b>NOW</b><h3>Working prototype</h3><p>Voice billing, stock, expiry and dashboard, live on the web.</p></div>
-      <div><b>NEXT</b><h3>Pilot in 5 stores</h3><p>Bengaluru chemists, real catalogue, time-per-bill measured.</p></div>
+      <div><b>NEXT</b><h3>Enterprise pilot</h3><p>One chain, 5 stores in Bengaluru. Real catalogue, time-per-bill and expiry loss measured.</p></div>
       <div><b>THEN</b><h3>Scan + prescription</h3><p>Barcode batch scan and prescription photo to line items.</p></div>
-      <div><b>LATER</b><h3>Reorder & GST</h3><p>Distributor orders from reorder alerts, GST return export.</p></div>
+      <div><b>LATER</b><h3>Chain-wide rollout</h3><p>Roles, ERP sync, distributor reorders and GST export across all stores.</p></div>
     </div>
   </div>
 </section>
 
 <section class="cta">
   <div class="wrap">
-    <h2>Goli bolo, <span>bill lo.</span></h2>
-    <p>Open the counter in Chrome, tap the mic and say a bill. Demo store and medicines included.</p>
+    <h2>Goli bolo <span>Aur bill le lo.</span></h2>
+    <p>Run a pilot in your stores. See the live counter and talk to the Sarvam voice agent today.</p>
     <div class="ctas" style="justify-content:center"><a class="btn primary" href="https://indus.sarvam.ai/samvaad/build/update-agent/Conversatio-5525ad21-939f" target="_blank" rel="noopener">Talk to the agent →</a><a class="btn ghost" href="./">Open the live counter</a></div>
   </div>
 </section>
