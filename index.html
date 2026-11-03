@@ -1222,8 +1222,8 @@ function encodeWav(chunks,inRate){
 const silentWav=()=>encodeWav([new Float32Array(16000)],16000).blob;
 function sarvamError(status,body){
   const er=(body&&body.error)||{}; const code=er.code||''; const msg=(er.message||'').slice(0,140);
-  if(code==='insufficient_quota_error') return 'Sarvam credits are used up. Add credit in dashboard.sarvam.ai.';
-  if(code==='invalid_api_key_error'||code==='authentication_error') return 'Sarvam says this key is invalid (invalid_api_key_error). Use the API subscription key from dashboard.sarvam.ai → API Keys, not the Samvaad agent key.';
+  if(code==='insufficient_quota_error') return 'Sarvam credits are used up. Add credit in indus.sarvam.ai.';
+  if(code==='invalid_api_key_error'||code==='authentication_error') return 'Sarvam says this key is invalid (invalid_api_key_error). Create a key at indus.sarvam.ai → API Keys (the Samvaad agent key does not work here).';
   if(status===429||code==='rate_limit_exceeded_error') return 'Sarvam is busy. Try again.';
   if(status===503&&code==='NOT_CONFIGURED') return 'No Sarvam key on the server yet.';
   return `Sarvam error ${status}${code?' · '+code:''}${msg?' · '+msg:''}`;
