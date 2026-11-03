@@ -1,0 +1,11 @@
+{
+  "name": "pharma-com",
+  "version": "0.2.0",
+  "private": true,
+  "description": "Voice-first pharmacy billing and stock prototype (Hindi, English, Marathi, Kannada, Telugu) using Sarvam speech-to-text.",
+  "scripts": {
+    "test": "node tests/parser.test.js",
+    "build": "python3 tools/bundle.py",
+    "dev": "npx vercel dev"
+  }
+}

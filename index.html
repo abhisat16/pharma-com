@@ -1,0 +1,1437 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharma.com</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap">
+<style>
+/* Layout: the chemist's counter. Left, a deep-green voice station (mic, waveform, transcript). Right, the thermal bill slip it fills. Tabs: stock, bills, today. */
+:root{
+  --paper:#EEF2EF; --surface:#FFFFFF; --sunk:#F4F7F5; --ink:#0F1F1A; --muted:#5E7068; --line:#D7E0DB;
+  --brand:#0B6A55; --brand-2:#0D8269; --brand-ink:#FFFFFF; --brand-soft:#DCEDE6;
+  --station:#0A4A3C; --station-2:#0E5A49; --station-ink:#F2FBF7; --station-muted:#9CC9B9;
+  --signal:#F0613A; --signal-soft:#FBE3DB;
+  --slip:#FFFEF8; --slip-ink:#1C1C1A; --slip-muted:#75736B; --slip-rule:#D2CFC3;
+  --ok:#1B7A47; --ok-soft:#DDF1E4; --warn:#94600A; --warn-soft:#FAEED6; --bad:#B42318; --bad-soft:#FCE5E1; --rx:#5A3EA6; --rx-soft:#ECE6FA;
+  --display:"Bricolage Grotesque","Noto Sans",system-ui,sans-serif;
+  --body:"Noto Sans","Noto Sans Devanagari","Noto Sans Kannada","Noto Sans Telugu",system-ui,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  --lvl:0;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --paper:#0B1411; --surface:#121E1A; --sunk:#0F1916; --ink:#E2ECE8; --muted:#93A79F; --line:#22322D;
+  --brand:#2FB58F; --brand-2:#4CC7A3; --brand-ink:#04231A; --brand-soft:#15322A;
+  --station:#0E3A30; --station-2:#134A3D; --station-ink:#EAF7F1; --station-muted:#8DBFAD;
+  --signal:#FF7A52; --signal-soft:#3A1D14;
+  --slip:#F3F0E5; --slip-ink:#1C1C1A; --slip-muted:#64625B; --slip-rule:#C3BFB2;
+  --ok:#5ECF8D; --ok-soft:#163224; --warn:#F0B354; --warn-soft:#342812; --bad:#FF8A7D; --bad-soft:#3A1915; --rx:#B9A3FF; --rx-soft:#2A2340;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0B1411; --surface:#121E1A; --sunk:#0F1916; --ink:#E2ECE8; --muted:#93A79F; --line:#22322D;
+  --brand:#2FB58F; --brand-2:#4CC7A3; --brand-ink:#04231A; --brand-soft:#15322A;
+  --station:#0E3A30; --station-2:#134A3D; --station-ink:#EAF7F1; --station-muted:#8DBFAD;
+  --signal:#FF7A52; --signal-soft:#3A1D14;
+  --slip:#F3F0E5; --slip-ink:#1C1C1A; --slip-muted:#64625B; --slip-rule:#C3BFB2;
+  --ok:#5ECF8D; --ok-soft:#163224; --warn:#F0B354; --warn-soft:#342812; --bad:#FF8A7D; --bad-soft:#3A1915; --rx:#B9A3FF; --rx-soft:#2A2340;
+  color-scheme:dark}
+
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.5 var(--body);min-height:100%;display:flex;flex-direction:column}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--brand-2);outline-offset:2px;border-radius:8px}
+h1,h2{font-family:var(--display);margin:0;letter-spacing:-.015em;text-wrap:balance}
+h1{font-size:28px;font-weight:700}
+h2{font-size:16px;font-weight:700}
+.sub{color:var(--muted);font-size:14px}
+.eyebrow{font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.row-between{display:flex;gap:8px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+svg{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ---------- top bar ---------- */
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--surface)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding-block:10px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.brand{display:flex;align-items:center;gap:10px;min-width:0}
+.mark{width:36px;height:36px;flex:none;stroke:none}
+.mark *{stroke:none}
+.mark circle{stroke:var(--surface);stroke-width:2}
+.brand-t{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand-t b{font-family:var(--display);font-size:20px;letter-spacing:-.02em}
+.brand-t span{font-size:12px;color:var(--muted);white-space:nowrap}
+.nav{display:flex;gap:4px;margin-inline:auto}
+.nav a{position:relative;display:flex;align-items:center;gap:7px;text-decoration:none;color:var(--muted);font-weight:600;font-size:14px;padding:8px 14px;border-radius:10px}
+.nav a svg{width:18px;height:18px}
+.nav a:hover{color:var(--ink);background:var(--sunk)}
+.nav a[aria-current="page"]{color:var(--brand);background:var(--brand-soft)}
+.nav a i{position:absolute;top:6px;left:24px;width:7px;height:7px;border-radius:50%;background:var(--bad);border:1.5px solid var(--surface)}
+.bar-r{display:flex;align-items:center;gap:8px}
+.pill{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 12px;font-size:12.5px;font-weight:600;cursor:pointer;color:var(--muted);white-space:nowrap}
+.pill::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.pill.ok::before{background:var(--ok)} .pill.warn::before{background:var(--warn)} .pill.bad::before{background:var(--bad)}
+.icon{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:36px;height:36px;display:grid;place-items:center;cursor:pointer;color:var(--muted);flex:none}
+.icon svg{width:18px;height:18px}
+@media (max-width:820px){
+  .bar{flex-wrap:wrap}
+  .nav{position:fixed;left:0;right:0;bottom:0;margin:0;z-index:20;background:var(--surface);border-top:1px solid var(--line);justify-content:space-around;padding-block:6px calc(6px + env(safe-area-inset-bottom,0px));padding-left:max(8px,env(safe-area-inset-left,0px));padding-right:max(8px,env(safe-area-inset-right,0px))}
+  .nav a{flex-direction:column;gap:2px;font-size:11.5px;padding:6px 10px;flex:1}
+  .nav a i{left:auto;right:calc(50% - 16px)}
+  .bar-r{margin-left:auto}
+  body{padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  .pill span{max-width:120px;overflow:hidden;text-overflow:ellipsis}
+}
+
+main{flex:1;width:100%;max-width:1240px;margin:0 auto;padding-block:22px 28px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.view{display:flex;flex-direction:column;gap:16px}
+
+/* ---------- counter ---------- */
+.counter{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,420px);gap:24px;align-items:start}
+@media (max-width:900px){.counter{grid-template-columns:minmax(0,1fr)}}
+.voice-col{display:flex;flex-direction:column;gap:14px;min-width:0}
+.station{position:relative;background:radial-gradient(120% 90% at 50% 0%,var(--station-2),var(--station) 70%);color:var(--station-ink);border-radius:24px;padding:18px 20px 22px;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:400px;overflow:hidden}
+.langs{display:flex;flex-wrap:wrap;justify-content:center;gap:4px;background:rgba(255,255,255,.08);border-radius:999px;padding:4px}
+.langs button{border:0;background:transparent;color:var(--station-muted);border-radius:999px;padding:5px 12px;font-size:14px;font-weight:600;cursor:pointer}
+.langs button:hover{color:var(--station-ink)}
+.langs button[aria-pressed="true"]{background:var(--station-ink);color:var(--station)}
+#mic{position:relative;margin-top:26px;width:132px;height:132px;border-radius:50%;border:0;background:var(--station-ink);color:var(--station);cursor:pointer;display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,255,255,.06),0 0 0 26px rgba(255,255,255,.03);transition:background .15s,transform .15s}
+#mic:hover{transform:scale(1.03)}
+#mic:active{transform:scale(.97)}
+#mic svg{width:50px;height:50px;position:relative}
+#mic .ring{position:absolute;inset:-14px;border-radius:50%;border:3px solid var(--signal);opacity:0;transform:scale(calc(.94 + var(--lvl)*.45));transition:transform .07s linear}
+body.listening #mic{background:var(--signal);color:#fff}
+body.listening #mic .ring{opacity:.7}
+body.busy #mic{opacity:.6;pointer-events:none}
+.wave{display:flex;align-items:center;gap:4px;height:34px}
+.wave i{display:block;width:4px;height:4px;border-radius:2px;background:var(--station-muted);opacity:.55;transition:height .08s linear}
+body.listening .wave i{background:var(--station-ink);opacity:.95}
+.mic-state{margin:0;font-family:var(--display);font-size:22px;font-weight:700;letter-spacing:-.01em}
+.live{width:100%;max-width:560px;text-align:center;font-size:20px;line-height:1.45;overflow-wrap:anywhere;min-height:30px}
+.live .src{display:inline-block;margin-top:6px;font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--station-muted);font-weight:700}
+.type{display:flex;gap:8px}
+.type input{flex:1;min-width:0;border:1px solid var(--line);border-radius:14px;padding:12px 14px;background:var(--surface);font-size:15px}
+.type button{width:48px;border:0;border-radius:14px;background:var(--ink);color:var(--surface);cursor:pointer;display:grid;place-items:center;flex:none}
+.type button svg{width:20px;height:20px;stroke-width:2.2}
+.demo{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip-btn{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 13px;font-size:14px;cursor:pointer;font-weight:600}
+.chip-btn:hover{border-color:var(--brand);color:var(--brand)}
+.chip-btn.alt{border-style:dashed;color:var(--muted)}
+
+/* ---------- thermal slip ---------- */
+.slip-col{position:sticky;top:84px;min-width:0}
+@media (max-width:900px){.slip-col{position:static}}
+.slip{--tear:9px;position:relative;background:var(--slip);color:var(--slip-ink);font-family:var(--mono);font-size:13px;line-height:1.5;padding:22px 22px 28px;border-radius:6px 6px 0 0;box-shadow:0 18px 34px -22px rgba(0,0,0,.45);min-height:400px;display:flex;flex-direction:column;
+  -webkit-mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--tear)) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/calc(var(--tear)*2) var(--tear) repeat-x;
+          mask:linear-gradient(#000 0 0) top/100% calc(100% - var(--tear)) no-repeat,conic-gradient(from -45deg at bottom,#0000,#000 1deg 89deg,#0000 90deg) bottom/calc(var(--tear)*2) var(--tear) repeat-x}
+.s-store{text-align:center;display:flex;flex-direction:column;padding-bottom:10px;border-bottom:1px dashed var(--slip-rule)}
+.s-store b{font-family:var(--display);font-size:16px}
+.s-store span{font-size:11px;color:var(--slip-muted)}
+.s-title{display:flex;justify-content:space-between;align-items:center;font-size:11px;letter-spacing:.2em;font-weight:600;margin:12px 0 6px;color:var(--slip-muted)}
+.s-title b{color:var(--slip-ink)}
+.s-kv{display:flex;justify-content:space-between;gap:10px}
+.s-kv span{color:var(--slip-muted)}
+.s-rule{border:0;border-top:1px dashed var(--slip-rule);margin:10px 0;width:100%}
+.s-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;color:var(--slip-muted);padding:30px 0}
+.s-empty svg{width:46px;height:46px;stroke:var(--slip-rule);stroke-width:1.5}
+.s-empty .big{font-family:var(--display);font-size:22px;color:var(--slip-ink)}
+.s-today{display:flex;gap:18px;margin-top:6px}
+.s-today div{display:flex;flex-direction:column;align-items:center}
+.s-today b{font-family:var(--display);font-size:20px;color:var(--slip-ink)}
+.s-today span{font-size:10.5px;letter-spacing:.08em;text-transform:uppercase}
+.s-patient{display:grid;grid-template-columns:minmax(0,1fr) 60px;gap:10px;margin:4px 0}
+.s-patient input{border:0;border-bottom:1px solid var(--slip-rule);background:transparent;color:var(--slip-ink);font-family:var(--display);font-size:20px;font-weight:700;padding:2px 0;border-radius:0;min-width:0}
+.s-patient input::placeholder{color:var(--slip-rule)}
+.s-patient input:focus{outline:none;border-bottom-color:var(--slip-ink)}
+.s-patient .age{text-align:right}
+.s-items{display:flex;flex-direction:column}
+.s-item{padding:9px 0;border-bottom:1px dotted var(--slip-rule);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:3px 10px;align-items:baseline}
+.s-item:last-child{border-bottom:0}
+.s-name{font-weight:600;font-size:14px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.s-amt{text-align:right;font-weight:600}
+.s-meta{grid-column:1/-1;font-size:11px;color:var(--slip-muted)}
+.s-qty{grid-column:1/-1;display:flex;align-items:center;gap:6px;font-size:12px;color:var(--slip-muted)}
+.step{display:inline-flex;align-items:center;border:1px solid var(--slip-rule);border-radius:6px;overflow:hidden}
+.step button{border:0;background:transparent;color:var(--slip-ink);width:26px;height:26px;cursor:pointer;font-family:var(--mono);font-size:15px}
+.step button:hover{background:rgba(0,0,0,.05)}
+.step input{width:38px;border:0;border-inline:1px solid var(--slip-rule);background:transparent;color:var(--slip-ink);font-family:var(--mono);text-align:center;height:26px;-moz-appearance:textfield}
+.step input::-webkit-inner-spin-button{display:none}
+.s-qty select{border:1px solid var(--slip-rule);border-radius:6px;background:transparent;color:var(--slip-ink);font-family:var(--mono);font-size:12px;height:28px;padding:0 4px}
+.s-x{margin-left:auto;border:0;background:transparent;color:var(--slip-muted);cursor:pointer;width:26px;height:26px;border-radius:6px;display:grid;place-items:center}
+.s-x:hover{color:var(--bad);background:rgba(0,0,0,.05)}
+.s-x svg{width:15px;height:15px}
+.flag{display:inline-block;font-family:var(--body);font-size:10px;font-weight:700;letter-spacing:.04em;border-radius:4px;padding:0 5px;line-height:16px}
+.flag.rx{background:var(--rx);color:#fff} .flag.warn{background:var(--warn);color:#fff} .flag.bad{background:var(--bad);color:#fff} .flag.ok{background:var(--ok);color:#fff}
+.s-fix{grid-column:1/-1;margin-top:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--body);font-size:12.5px;color:var(--bad);font-weight:700}
+.s-fix.warn{color:var(--warn)}
+.s-fix button{border:1px solid currentColor;background:transparent;color:var(--brand);border-color:var(--brand);border-radius:999px;padding:2px 10px;font-weight:700;cursor:pointer;font-size:12px}
+.s-add select{width:100%;border:1px dashed var(--slip-rule);background:transparent;color:var(--slip-muted);font-family:var(--mono);font-size:12px;padding:7px;border-radius:6px;margin-top:6px}
+.s-total{position:relative;display:flex;justify-content:space-between;align-items:baseline;font-size:12px;letter-spacing:.12em;color:var(--slip-muted)}
+.s-total b{font-size:28px;font-family:var(--display);letter-spacing:-.01em;color:var(--slip-ink)}
+.s-pay{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-top:8px}
+.s-pay button{border:1px solid var(--slip-rule);background:transparent;color:var(--slip-ink);font-family:var(--mono);font-size:12px;padding:6px;border-radius:6px;cursor:pointer}
+.s-pay button[aria-pressed="true"]{background:var(--slip-ink);color:var(--slip);border-color:var(--slip-ink)}
+.s-actions{display:flex;flex-direction:column;gap:6px;margin-top:auto;padding-top:14px;font-family:var(--body)}
+.s-go{border:0;border-radius:12px;background:var(--brand);color:var(--brand-ink);font-weight:700;font-size:16px;padding:14px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px}
+.s-go:hover{background:var(--brand-2)}
+.s-go[disabled]{opacity:.35;cursor:not-allowed}
+.s-go kbd{font-family:var(--mono);font-size:11px;border:1px solid currentColor;border-radius:4px;padding:0 5px;opacity:.7;font-weight:400}
+.s-sec{display:flex;gap:6px}
+.s-sec button{flex:1;border:1px solid var(--slip-rule);border-radius:12px;background:transparent;color:var(--slip-ink);font-weight:600;padding:10px;cursor:pointer;font-size:14px}
+.s-say{text-align:center;font-size:12px;color:var(--slip-muted);margin:2px 0 0}
+.s-stamp{position:absolute;left:30%;top:0;transform:rotate(-9deg);border:3px solid var(--ok);color:var(--ok);font-family:var(--display);font-weight:700;letter-spacing:.14em;padding:0 10px;border-radius:6px;font-size:20px;opacity:.85;pointer-events:none}
+.s-note{font-size:10.5px;color:var(--slip-muted);margin:8px 0 0}
+.s-speed{display:flex;align-items:center;justify-content:center;gap:8px;font-family:var(--body);font-size:13px;margin-top:12px;padding:8px;border-radius:10px;background:var(--ok-soft);color:var(--ok);font-weight:600}
+.s-speed b{font-family:var(--display);font-size:18px}
+.s-card{border:1px solid var(--slip-rule);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:2px;margin-top:8px}
+.s-card .qty{font-family:var(--display);font-size:26px;font-weight:700}
+
+/* ---------- pages ---------- */
+.tools{display:flex;gap:8px;flex-wrap:wrap}
+#invSort{border:1px solid var(--line);border-radius:12px;padding:9px 10px;background:var(--surface)}
+.seg{display:inline-flex;flex-wrap:wrap;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px}
+.seg button{border:0;background:transparent;border-radius:9px;padding:6px 12px;font-size:13.5px;font-weight:600;color:var(--muted);cursor:pointer;white-space:nowrap}
+.seg button:hover{color:var(--ink)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--surface)}
+.seg button.red[aria-pressed="false"]{color:var(--bad)}
+.exp-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.exp-sum{font-size:13.5px;color:var(--muted);margin-left:auto}
+.exp-sum b{color:var(--ink)}
+.days{display:block;font-size:12px;font-weight:700;font-family:var(--body)}
+.days.bad{color:var(--bad)} .days.warn{color:var(--warn)} .days.ok{color:var(--muted);font-weight:600}
+tr.expired td{background:var(--bad-soft)}
+tr.expired td:first-child{box-shadow:inset 3px 0 0 var(--bad)}
+.rank{display:inline-grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sunk);font-size:12px;font-weight:700;color:var(--muted)}
+tr.top .rank{background:var(--brand);color:var(--brand-ink)}
+tr.top td b{color:var(--brand)}
+.share{height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;margin-top:5px;max-width:160px}
+.share i{display:block;height:100%;background:var(--brand);border-radius:3px}
+.page-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+#invSearch{border:1px solid var(--line);border-radius:12px;padding:9px 14px;background:var(--surface);width:260px;max-width:100%}
+.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:700px){.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.stat{border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 14px;text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:0}
+.stat b{font-family:var(--display);font-size:28px;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted);font-weight:600}
+.stat.bad b{color:var(--bad)} .stat.warn b{color:var(--warn)} .stat.rx b{color:var(--rx)}
+.stat[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;min-width:0;display:flex;flex-direction:column;gap:12px}
+.tablewrap{overflow-x:auto}
+table.t{width:100%;border-collapse:collapse;font-size:14px}
+table.t th{text-align:left;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:4px 10px 8px;border-bottom:1px solid var(--line);white-space:nowrap;font-weight:700}
+table.t td{padding:11px 10px;border-bottom:1px solid var(--line);vertical-align:middle}
+table.t tr:last-child td{border-bottom:0}
+table.t td small{display:block;color:var(--muted);font-size:12.5px}
+table.t .num{text-align:right;white-space:nowrap}
+table.t tbody tr.sel td{background:var(--brand-soft)}
+table.t tbody tr.click{cursor:pointer}
+table.t tbody tr.click:hover td{background:var(--sunk)}
+tr.flash td{animation:flash 1.8s ease-out}
+@keyframes flash{0%{background:var(--brand-soft)}100%{background:transparent}}
+.lvl{display:flex;align-items:center;gap:10px}
+.gauge{width:72px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden;flex:none}
+.gauge i{display:block;height:100%;background:var(--ok);border-radius:3px}
+.gauge i.low{background:var(--warn)} .gauge i.out{background:var(--bad)}
+.tag{display:inline-flex;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:var(--sunk);color:var(--muted);white-space:nowrap;vertical-align:1px}
+.tag.ok{background:var(--ok-soft);color:var(--ok)} .tag.low,.tag.warn{background:var(--warn-soft);color:var(--warn)} .tag.out,.tag.bad{background:var(--bad-soft);color:var(--bad)} .tag.rx{background:var(--rx-soft);color:var(--rx)}
+@media (max-width:640px){.hide-s{display:none}#stockBody .gauge{display:none}}
+.empty{color:var(--muted);padding:28px 4px;margin:0;text-align:center}
+.bills-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,380px);gap:24px;align-items:start}
+@media (max-width:900px){.bills-grid{grid-template-columns:minmax(0,1fr)}}
+.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+@media (max-width:760px){.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.kpi{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px 16px}
+.kpi span{display:block;font-size:13px;color:var(--muted);font-weight:600}
+.kpi b{display:block;font-family:var(--display);font-size:30px;font-weight:700;font-variant-numeric:tabular-nums;line-height:1.2}
+.kpi.hero{background:var(--station);border-color:var(--station);color:var(--station-ink)}
+.kpi.hero span{color:var(--station-muted)}
+.ins-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.ins-grid{grid-template-columns:minmax(0,1fr)}}
+#timeChart svg{width:100%;height:auto;display:block;stroke:none}
+.log{list-style:none;margin:0;padding:0;max-height:480px;overflow:auto}
+.log li{padding:10px 0;border-bottom:1px solid var(--line);display:grid;grid-template-columns:70px minmax(0,1fr);gap:2px 10px}
+.log li:last-child{border-bottom:0}
+.log .t{white-space:nowrap;font-family:var(--mono);font-size:12px;color:var(--muted);padding-top:2px}
+.log .txt{overflow-wrap:anywhere}
+.log .out{grid-column:2;font-size:12.5px;color:var(--muted)}
+
+/* ---------- footer, modal, toast ---------- */
+.foot{display:flex;justify-content:space-between;gap:10px;font-size:12.5px;color:var(--muted);padding-block:10px 18px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));max-width:1240px;width:100%;margin:0 auto}
+.dot{display:inline-flex;align-items:center;gap:7px}
+.dot::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--muted)}
+.dot.cloud::before{background:var(--ok)}
+.link{border:0;background:transparent;color:var(--muted);text-decoration:underline;cursor:pointer;font-size:12.5px;padding:0}
+.btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;padding:9px 16px;cursor:pointer;font-weight:700}
+.btn.primary{background:var(--brand);border-color:var(--brand);color:var(--brand-ink)}
+.btn.sm{padding:5px 10px;font-size:12.5px}
+.modal{position:fixed;inset:0;background:rgba(6,18,14,.55);display:grid;place-items:center;padding:16px;z-index:50}
+.sheet{background:var(--surface);border:1px solid var(--line);border-radius:18px;width:min(460px,100%);max-height:calc(100% - 32px);overflow:auto;padding:20px;display:flex;flex-direction:column;gap:14px}
+.sheet p{margin:0}
+.note{background:var(--warn-soft);border-radius:10px;padding:10px 12px;font-size:13.5px}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:700;font-size:13.5px}
+.keyrow{display:flex;gap:6px}
+.keyrow input{flex:1;min-width:0;border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-family:var(--mono);background:var(--sunk)}
+.check{display:flex;gap:10px;align-items:center;font-size:14px}
+.check input{width:18px;height:18px;accent-color:var(--brand);margin:0}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);background:var(--ink);color:var(--surface);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;pointer-events:none;transition:.2s;z-index:60;width:max-content;max-width:calc(100% - 32px)}
+.toast.show{opacity:1;transform:translate(-50%,0)}
+.toast.bad{background:var(--bad);color:#fff} .toast.ok{background:var(--ok);color:#fff}
+@media (max-width:820px){.s-go kbd{display:none}.toast{bottom:calc(78px + env(safe-area-inset-bottom,0px))}}
+#printArea{display:none}
+@media print{
+  body{background:#fff;padding:0}
+  body > *:not(#printArea){display:none!important}
+  body::before{display:none}
+  #printArea{display:block;width:76mm;margin:0 auto}
+  #printArea .slip{box-shadow:none;-webkit-mask:none;mask:none;padding:0;background:#fff;min-height:0}
+  @page{margin:6mm}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- voice agent ---------- */
+.agent-btn{display:inline-flex;align-items:center;gap:8px;border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.06);color:var(--station-ink);border-radius:999px;padding:8px 16px;font-weight:700;font-size:14px;cursor:pointer;margin-top:auto}
+.agent-btn:hover{background:rgba(255,255,255,.12)}
+.ag-dot{width:9px;height:9px;border-radius:50%;background:var(--station-muted)}
+body.agent .agent-btn{background:var(--signal);border-color:var(--signal);color:#fff}
+body.agent .ag-dot{background:#fff;animation:pulse 1.2s ease-in-out infinite}
+body.agent #mic{background:var(--signal);color:#fff}
+@keyframes pulse{50%{opacity:.35}}
+.live .who{display:block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--station-muted);font-weight:700;margin-bottom:2px}
+.agent-set{border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.agent-set summary{cursor:pointer;font-weight:700;font-size:13.5px}
+.agent-set[open]{display:flex;flex-direction:column;gap:10px}
+.agent-set input{border:1px solid var(--line);border-radius:10px;padding:9px 10px;font-family:var(--mono);background:var(--sunk);font-weight:400;min-width:0}
+.agent-set .two{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style></head>
+<body>
+<header class="bar">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--brand)"/><path d="M16 9h8v7h7v8h-7v7h-8v-7H9v-8h7z" fill="var(--brand-ink)"/><circle cx="31" cy="31" r="6" fill="var(--signal)" stroke="var(--brand)" stroke-width="2"/></svg>
+    <div class="brand-t"><b>Pharma.com</b><span>Shree Sai Medicals</span></div>
+  </div>
+  <nav class="nav" aria-label="Sections">
+    <a href="#counter" data-view="counter"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Counter</span></a>
+    <a href="#stock" data-view="stock"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg><span>Stock</span><i id="navAlert" hidden></i></a>
+    <a href="#bills" data-view="bills"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6"/></svg><span>Bills</span></a>
+    <a href="#insights" data-view="insights"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Dashboard</span></a>
+  </nav>
+  <div class="bar-r">
+    <button type="button" id="engine" class="pill" title="Speech engine"><span id="engineTxt">…</span></button>
+    <button type="button" id="openSet" class="icon" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="view" id="v-counter" aria-label="Counter">
+    <div class="counter">
+      <div class="voice-col">
+        <div class="station">
+          <div id="langs" class="langs" role="group" aria-label="Language"></div>
+          <button type="button" id="mic" aria-label="Tap to speak"><span class="ring"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg></button>
+          <div class="wave" id="wave" aria-hidden="true"></div>
+          <p id="micState" class="mic-state">Tap to speak</p>
+          <div id="live" class="live" aria-live="polite"></div>
+          <button type="button" id="agentBtn" class="agent-btn" hidden><span class="ag-dot"></span><span id="agentTxt">Talk to agent</span></button>
+        </div>
+        <form id="typeForm" class="type">
+          <label for="cmd" class="sr">Type a command</label>
+          <input id="cmd" autocomplete="off" placeholder="Type a command">
+          <button type="submit" aria-label="Run"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+        <div class="demo"><span class="eyebrow">Demo</span><div id="examples" class="chips"></div></div>
+      </div>
+      <div class="slip-col"><div id="slip" class="slip" aria-live="polite"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-stock" aria-label="Stock" hidden>
+    <div class="page-head">
+      <h1>Stock</h1>
+      <div class="tools">
+        <input id="invSearch" type="search" placeholder="Search" autocomplete="off" aria-label="Search stock">
+        <select id="invSort" aria-label="Sort"><option value="expiry">Expiry first</option><option value="value">Stock value</option><option value="rack">Rack</option><option value="name">Name</option></select>
+      </div>
+    </div>
+    <div id="stockStats" class="stats" role="group" aria-label="Filter by stock level"></div>
+    <div class="exp-bar"><span class="eyebrow">Expires within</span><div id="expWin" class="seg" role="group" aria-label="Expiry window"></div><span id="expSum" class="exp-sum"></span></div>
+    <div id="stockBody" class="panel"></div>
+  </section>
+
+  <section class="view" id="v-bills" aria-label="Bills" hidden>
+    <div class="page-head"><h1>Bills</h1><span id="billsSub" class="sub"></span></div>
+    <div class="bills-grid"><div id="billsBody" class="panel"></div><div class="slip-col"><div id="billSlip" class="slip"></div></div></div>
+  </section>
+
+  <section class="view" id="v-insights" aria-label="Insights" hidden>
+    <div class="page-head"><h1>Dashboard</h1><div id="period" class="seg" role="group" aria-label="Period"></div></div>
+    <div id="kpis" class="kpis"></div>
+    <div class="ins-grid">
+      <div class="panel"><div class="row-between"><h2>Top sellers</h2><span class="sub" id="topSub"></span></div><div id="topBody"></div></div>
+      <div class="panel"><div class="row-between"><h2>Sell first</h2><span class="sub" id="riskSub"></span></div><div id="riskBody"></div></div>
+      <div class="panel"><h2>Seconds per bill · today</h2><div id="timeChart"></div></div>
+      <div class="panel"><h2>Voice log</h2><div id="logBody"></div></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><span id="dataMode" class="dot"></span><button type="button" class="link" id="resetData">Reset demo</button></footer>
+
+<div class="modal" id="setModal" hidden role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="sheet">
+    <div class="row-between"><h2 id="setTitle">Settings</h2><button type="button" class="icon" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p id="voiceNote" class="note" hidden></p>
+    <label class="field" for="setKey">Sarvam API key
+      <span class="keyrow"><input id="setKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk_…"><button type="button" class="btn sm" id="setShow">Show</button></span>
+    </label>
+    <p id="keyStatus" class="sub"></p>
+    <details class="agent-set" id="agentSet">
+      <summary>Voice agent (Samvaad)</summary>
+      <label class="field" for="agKey">Agent API key<input id="agKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk_samvaad_…"></label>
+      <label class="field" for="agApp">Agent ID<input id="agApp" autocomplete="off" spellcheck="false" placeholder="App / agent ID"></label>
+      <div class="two"><label class="field" for="agOrg">Org ID<input id="agOrg" autocomplete="off" spellcheck="false"></label><label class="field" for="agWs">Workspace ID<input id="agWs" autocomplete="off" spellcheck="false"></label></div>
+      <p class="sub" id="agStatus"></p>
+    </details>
+    <label class="check"><input type="checkbox" id="setVoice"><span>Use Sarvam for speech</span></label>
+    <label class="check"><input type="checkbox" id="setSpeak"><span>Speak replies</span></label>
+    <label class="check"><input type="checkbox" id="setPrint"><span>Print on confirm</span></label>
+    <div class="row-between"><button type="button" class="btn" id="setTest">Test key</button><button type="button" class="btn primary" id="setSave">Save</button></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast" role="status"></div>
+<script>
+/*! sarvam-conv-ai-sdk 0.0.42 (browser entry), MIT licence, (c) Sarvam AI. Bundled with esbuild as window.SarvamConv. */
+(()=>{var z=Object.defineProperty;var P=(i=>typeof require<"u"?require:typeof Proxy<"u"?new Proxy(i,{get:(e,t)=>(typeof require<"u"?require:e)[t]}):i)(function(i){if(typeof require<"u")return require.apply(this,arguments);throw Error('Dynamic require of "'+i+'" is not supported')});var j=(i,e)=>()=>(e||i((e={exports:{}}).exports,e),e.exports),J=(i,e)=>{for(var t in e)z(i,t,{get:e[t],enumerable:!0})};var F=j(()=>{});var M={};J(M,{AgentState:()=>h,AuthenticationError:()=>S,BrowserAudioInterface:()=>O,ConversationAgent:()=>A,ForbiddenError:()=>E,InteractionType:()=>b,NotFoundError:()=>v,RateLimitError:()=>w,SDKError:()=>k,ServerError:()=>T,createConversation:()=>q});var L;(function(i){i.LINEAR16="audio/wav"})(L||(L={}));var D;(function(i){i.MEDIA="media",i.ACTION="action",i.SYSTEM="system",i.EVENT="event"})(D||(D={}));var R;(function(i){i.PENDING="pending",i.COMPLETED="completed",i.FAILED="failed"})(R||(R={}));var B;(function(i){i.MEDIA="media",i.ACTION="action",i.SYSTEM="system"})(B||(B={}));var g;(function(i){i.SERVER="server",i.CLIENT="client"})(g||(g={}));var f;(function(i){i.AUDIO_CHUNK="server.media.audio_chunk",i.AUDIO="server.media.audio",i.TEXT="server.media.text",i.TEXT_CHUNK="server.media.text_chunk",i.PING="server.system.ping",i.INTERACTION_END="server.action.interaction_end",i.INTERACTION_CONNECTED="server.action.interaction_connected",i.USER_SPEECH_START="server.event.user_speech_start",i.USER_SPEECH_END="server.event.user_speech_end",i.USER_INTERRUPT="server.event.user_interrupt",i.VARIABLE_UPDATE="server.event.variable_update",i.LANGUAGE_CHANGE="server.event.language_change",i.STATE_TRANSITION="server.event.state_transition",i.TRANSCRIPTION="server.event.transcription",i.KB_QUERY="server.event.kb_query",i.TOOL_CALL="server.event.tool_call"})(f||(f={}));var y;(function(i){i.AUDIO_CHUNK="client.media.audio_chunk",i.TEXT="client.media.text",i.TEXT_CHUNK="client.media.text_chunk",i.AUDIO="client.media.audio",i.INTERACTION_START="client.action.interaction_start",i.INTERACTION_END="client.action.interaction_end",i.VARIABLE_UPDATE="client.action.variable_update",i.LANGUAGE_CHANGE="client.action.language_change",i.STATE_TRANSITION="client.action.state_transition",i.PONG="client.system.pong"})(y||(y={}));var b;(function(i){i.CHAT="chat",i.CALL="call"})(b||(b={}));var W;(function(i){i.PHONE_NUMBER="phone_number",i.EMAIL="email",i.CUSTOM="custom",i.UNKNOWN="unknown"})(W||(W={}));var G;(function(i){i.USER="user",i.BOT="bot"})(G||(G={}));var h;(function(i){i.IDLE="idle",i.CONNECTING="connecting",i.CONNECTED="connected",i.LISTENING="listening",i.SPEAKING="speaking",i.ERROR="error"})(h||(h={}));var k=class extends Error{code;statusCode;constructor(e,t,s){super(e),this.name="SDKError",this.code=t,this.statusCode=s,Error.captureStackTrace&&Error.captureStackTrace(this,this.constructor)}},w=class extends k{retryAfter;constructor(e,t=60){super(e,"RATE_LIMITED",429),this.name="RateLimitError",this.retryAfter=t}},S=class extends k{constructor(e){super(e,"AUTHENTICATION_FAILED",401),this.name="AuthenticationError"}},E=class extends k{constructor(e){super(e,"FORBIDDEN",403),this.name="ForbiddenError"}},v=class extends k{constructor(e){super(e,"NOT_FOUND",404),this.name="NotFoundError"}},T=class extends k{constructor(e,t=500){super(e,"SERVER_ERROR",t),this.name="ServerError"}};function H(i){return{type:y.INTERACTION_START,origin:g.CLIENT,timestamp:Date.now()/1e3,agent_variables:i.agent_variables,initial_language_name:i.initial_language_name,initial_bot_message:i.initial_bot_message,initial_state_name:i.initial_state_name}}function K(i){if(!i||typeof i!="object")throw new Error("Invalid message: must be an object");if(!i.type)throw new Error("Invalid message: missing 'type' field");switch(i.type){case f.TEXT_CHUNK:case f.TEXT:case f.AUDIO_CHUNK:case f.USER_INTERRUPT:case f.INTERACTION_END:case f.INTERACTION_CONNECTED:case f.PING:return i;default:return console.warn(`[SDK] Unknown server message type: ${i.type}`),console.warn("[SDK] Full message:",JSON.stringify(i,null,2)),i}}function V(){return typeof navigator<"u"&&navigator.product==="ReactNative"}function $(){if(V()){if(typeof global<"u"&&global.WebSocket)return global.WebSocket;if(typeof window<"u"&&window.WebSocket)return window.WebSocket}if(typeof window<"u"&&typeof window.WebSocket<"u")return window.WebSocket;if(typeof P<"u"&&typeof process<"u")try{return F()}catch{throw new Error("WebSocket is not available. In Node.js, please install ws package: npm install ws")}throw new Error("WebSocket is not available. Please ensure you're in a supported environment.")}var _=class{apiKey;config;baseUrl;interactionId;referenceId;customHeaders;eventCallback;textCallback;transcriptCallback;startCallback;endCallback;stateCallback;telemetryCallback;ws;shouldStop=!1;websocketSendQueue=[];disconnectedEvent;connectedEvent;currentState=h.IDLE;sessionStartTime;wsConnectStartTime;signedUrlStartTime;firstAudioSent=!1;firstAudioReceived=!1;sessionEndInitiator;offlineStartTime;boundOfflineHandler;boundOnlineHandler;constructor(e){if(!e.config)throw new Error("config must be provided");this.apiKey=e.apiKey,this.config=e.config,this.baseUrl=e.baseUrl||"https://apps.sarvam.ai/api/app-runtime/",this.eventCallback=e.eventCallback,this.textCallback=e.textCallback,this.transcriptCallback=e.transcriptCallback,this.startCallback=e.startCallback,this.endCallback=e.endCallback,this.stateCallback=e.stateCallback,this.telemetryCallback=e.telemetryCallback,this.customHeaders=e.customHeaders}emitTelemetry(e,t){if(!this.telemetryCallback)return;let s={name:e,timestamp:Date.now(),sessionId:this.referenceId,interactionId:this.interactionId,properties:t};try{this.telemetryCallback(s)}catch(a){console.error("[SDK] Error in telemetryCallback:",a)}}get reference_id(){if(!this.referenceId)throw new Error("Reference ID is not set");return this.referenceId}set reference_id(e){this.referenceId=e}isWsClosed(){return!this.ws||this.ws.readyState===3}async start(){this.sessionStartTime=Date.now(),this.firstAudioSent=!1,this.firstAudioReceived=!1,this.startNetworkMonitoring(),this.setState(h.CONNECTING),this.emitTelemetry("session_started",{});let{signedUrl:e,referenceId:t}=await this.getSignedUrl();this.reference_id=t,console.log("[SDK] Got signed URL:",e),this.shouldStop=!1,this.disconnectedEvent=this.createEvent(),this.connectedEvent=this.createEvent();let s=this.augmentWsUrlWithParams(e);console.log("[SDK] Final WebSocket URL:",s),this.emitTelemetry("ws_connecting",{}),this.wsConnectStartTime=Date.now(),this.runWebSocketLoop(s),this.startCallback&&await this.startCallback()}async stop(){this.sessionEndInitiator||(this.sessionEndInitiator="user"),this.shouldStop=!0,this.stopNetworkMonitoring(),await this.onStop(),!this.isWsClosed()&&this.ws&&this.ws.close(),this.disconnectedEvent&&!this.disconnectedEvent.promise&&this.disconnectedEvent.resolve(),this.setState(h.IDLE),this.endCallback&&await this.endCallback()}async onStop(){}async waitForDisconnect(){this.disconnectedEvent&&await this.disconnectedEvent.promise}async waitForConnect(e){if(this.isConnected())return!0;this.connectedEvent||(this.connectedEvent=this.createEvent());try{e!==void 0?await Promise.race([this.connectedEvent.promise,new Promise((t,s)=>setTimeout(()=>s(new Error("Timeout")),e*1e3))]):await this.connectedEvent.promise}catch{return this.isConnected()}return this.isConnected()}isConnected(){return!this.isWsClosed()}getInteractionId(){return this.interactionId}getState(){return this.currentState}setState(e){if(this.currentState===e)return;let t=this.currentState;this.currentState=e,this.emitTelemetry("state_changed",{from:t,to:e}),this.stateCallback&&this.stateCallback(e,t)}createEvent(){let e,t=new Promise(s=>{e=s});return{resolve:e,promise:t}}constructUrl(){return`${this.baseUrl}orgs/${this.config.org_id}/workspaces/${this.config.workspace_id}/apps/${this.config.app_id}/url`}addQueryParam(e,t,s){let a=e.includes("?")?"&":"?";return`${e}${a}${encodeURIComponent(t)}=${encodeURIComponent(s)}`}addUserIdentifierParamsToString(e){let t=this.addQueryParam(e,"user_identifier",this.config.user_identifier);return t=this.addQueryParam(t,"user_identifier_type",this.config.user_identifier_type),t}augmentWsUrlWithParams(e){return this.addQueryParam(e,"interaction_type",this.config.interaction_type)}async getSignedUrl(){this.signedUrlStartTime=Date.now(),this.emitTelemetry("signed_url_requested",{});let e=this.constructUrl();this.config.interaction_type&&(e=this.addQueryParam(e,"interaction_type",this.config.interaction_type)),this.config.version&&(e=this.addQueryParam(e,"version",String(this.config.version))),console.log("[SDK] Fetching signed URL from:",e);let t={"X-API-Key":this.apiKey};this.addCustomHeaders(t);let a=await fetch(e,{method:"GET",headers:t});if(!a.ok){let r=await a.text().catch(()=>""),c=Date.now()-(this.signedUrlStartTime||Date.now());switch(this.emitTelemetry("signed_url_failed",{error:`${a.status} ${r}`,durationMs:c}),a.status){case 429:{let p=a.headers.get("x-retry-after"),m=p?parseInt(p,10):60;throw new w(`Rate limit exceeded. ${r||"Please try again later."}`,isNaN(m)?60:m)}case 401:throw new S(`Authentication failed: ${r||"Invalid or missing API key"}`);case 403:throw new E(`Access forbidden: ${r||"Insufficient permissions"}`);case 404:throw new v(`Resource not found: ${r||"The specified app, workspace, or organization was not found"}`);case 500:case 502:case 503:case 504:throw new T(`Server error: ${r||"Internal server error"}`,a.status);default:throw new Error(`Failed to get signed URL: ${a.status} ${r}`)}}let n;try{let r=await a.text();n=r?JSON.parse(r):null}catch(r){throw new Error(`Failed to parse JSON response: ${r instanceof Error?r.message:String(r)}`)}if(!n||!n.url||!n.reference_id){let r=this.config.version?`Version ${this.config.version} is specified.`:"No version specified. Using latest committed version.";throw new Error(`Invalid response from API: ${JSON.stringify(n)}. Expected object with 'url' and 'reference_id' properties. ${r} This may indicate the app has no committed version or the app_id/org_id/workspace_id is incorrect.`)}let u=n.url,l=n.reference_id,o=Date.now()-(this.signedUrlStartTime||Date.now());this.emitTelemetry("signed_url_received",{durationMs:o});let d=this.addUserIdentifierParamsToString(u);return d=this.modifySignedUrlString(d),{signedUrl:d,referenceId:l}}addCustomHeaders(e){this.customHeaders&&Object.assign(e,this.customHeaders)}modifySignedUrlString(e){return e}async flushSendQueue(){if(!(this.isWsClosed()||!this.ws||this.ws.readyState!==1))for(;this.websocketSendQueue.length>0;){let t=this.websocketSendQueue.shift(),s=JSON.stringify(t);this.ws.send(s)}}isReactNative(){return typeof navigator<"u"&&navigator.product==="ReactNative"}startNetworkMonitoring(){typeof window>"u"||typeof window.addEventListener!="function"||(this.boundOfflineHandler=()=>{this.offlineStartTime=Date.now(),this.sessionEndInitiator="network",this.emitTelemetry("network_offline",{})},this.boundOnlineHandler=()=>{let e=this.offlineStartTime?Date.now()-this.offlineStartTime:void 0;this.offlineStartTime=void 0,this.emitTelemetry("network_online",{offlineDurationMs:e})},window.addEventListener("offline",this.boundOfflineHandler),window.addEventListener("online",this.boundOnlineHandler))}stopNetworkMonitoring(){typeof window>"u"||typeof window.removeEventListener!="function"||(this.boundOfflineHandler&&(window.removeEventListener("offline",this.boundOfflineHandler),this.boundOfflineHandler=void 0),this.boundOnlineHandler&&(window.removeEventListener("online",this.boundOnlineHandler),this.boundOnlineHandler=void 0),this.offlineStartTime=void 0)}async runWebSocketLoop(e){return new Promise((t,s)=>{let a=$(),n=this.isReactNative(),u=!n&&typeof window<"u"&&typeof window.WebSocket<"u",l={},o=Object.keys(l).length>0?new a(e,l):new a(e);this.ws=o;let d=1;u||n?(o.addEventListener("open",async()=>{try{let r=Date.now()-(this.wsConnectStartTime||Date.now());this.emitTelemetry("ws_connected",{durationMs:r}),await this.sendInteractionStart(),await this.onWebSocketOpen(),this.flushSendQueue(),setInterval(()=>this.flushSendQueue(),100)}catch(r){s(r)}}),o.addEventListener("message",async r=>{try{let c=typeof r.data=="string"?r.data:r.data.toString(),p=JSON.parse(c);await this.routeMessage(p)}catch(c){console.error("Error processing WebSocket message:",c),this.emitTelemetry("error",{type:"message_processing",message:c instanceof Error?c.message:String(c)})}}),o.addEventListener("error",r=>{console.error("WebSocket error:",r);let c=n&&r.message?r.message:"WebSocket connection error";n&&r.message&&console.error("WebSocket error message from React Native:",r.message),this.sessionEndInitiator="error",this.emitTelemetry("ws_error",{error:c}),this.setState(h.ERROR),s(new Error("WebSocket connection error"))}),o.addEventListener("close",r=>{let c=this.sessionStartTime?Date.now()-this.sessionStartTime:0,p=this.sessionEndInitiator||"network";this.emitTelemetry("ws_disconnected",{code:r.code,reason:r.reason||void 0,wasClean:r.wasClean}),this.emitTelemetry("session_ended",{durationMs:c,initiatedBy:p,reason:r.reason||(r.wasClean?"clean_close":"connection_lost")}),this.stopNetworkMonitoring(),this.sessionEndInitiator=void 0,this.ws=void 0,this.shouldStop=!0,this.disconnectedEvent&&this.disconnectedEvent.resolve(),t()})):(o.on("open",async()=>{try{let r=Date.now()-(this.wsConnectStartTime||Date.now());this.emitTelemetry("ws_connected",{durationMs:r}),await this.sendInteractionStart(),await this.onWebSocketOpen(),this.flushSendQueue(),setInterval(()=>this.flushSendQueue(),100)}catch(r){s(r)}}),o.on("message",async r=>{try{let c=r.toString(),p=JSON.parse(c);await this.routeMessage(p)}catch(c){console.error("Error processing WebSocket message:",c),this.emitTelemetry("error",{type:"message_processing",message:c instanceof Error?c.message:String(c)})}}),o.on("error",r=>{console.error("WebSocket error:",r),this.sessionEndInitiator="error",this.emitTelemetry("ws_error",{error:r.message}),this.setState(h.ERROR),s(r)}),o.on("close",(r,c)=>{let p=this.sessionStartTime?Date.now()-this.sessionStartTime:0,m=this.sessionEndInitiator||"network",N=c?.toString()||void 0;this.emitTelemetry("ws_disconnected",{code:r,reason:N}),this.emitTelemetry("session_ended",{durationMs:p,initiatedBy:m,reason:N||"connection_closed"}),this.stopNetworkMonitoring(),this.sessionEndInitiator=void 0,this.ws=void 0,this.shouldStop=!0,this.disconnectedEvent&&this.disconnectedEvent.resolve(),t()}))})}async onWebSocketOpen(){}async sendInteractionStart(){if(!this.ws)throw new Error("WebSocket not connected");let e=H(this.config);if(!this.isWsClosed()){let t=JSON.stringify(e);this.ws.send(t)}}async routeMessage(e){try{let t=K(e);t.type===f.TEXT?await this.handleText(t):t.type===f.TRANSCRIPTION?await this.handleTranscript(t):t.type===f.INTERACTION_END?await this.handleInteractionEnd(t):t.type===f.PING?await this.handlePing(t):t.type===f.INTERACTION_CONNECTED?await this.handleInteractionStartAcknowledgement(t):await this.handleCustomMessage(t)}catch(t){console.error("Failed to parse server message:",t),console.error("Raw message:",e),this.emitTelemetry("error",{type:"message_parse",message:t instanceof Error?t.message:String(t)})}}async handleCustomMessage(e){await this.handleEvent(e)}async handleText(e){try{this.textCallback&&await this.textCallback(e)}catch(t){console.error("Error handling text message:",t)}}async handleTranscript(e){try{this.transcriptCallback&&await this.transcriptCallback(e)}catch(t){console.error("Error handling transcript message:",t)}}async handleEvent(e){this.eventCallback&&await this.eventCallback(e)}async handleInteractionStartAcknowledgement(e){this.interactionId=e.interaction_id,this.emitTelemetry("interaction_connected",{interactionId:e.interaction_id}),this.setState(h.CONNECTED),this.setState(h.LISTENING),this.connectedEvent?this.connectedEvent.resolve():console.warn("[SDK] connectedEvent was not set!")}async handleInteractionEnd(e){this.sessionEndInitiator="agent",this.setState(h.IDLE),this.endCallback&&await this.endCallback()}async handlePing(e){try{if(!this.isWsClosed()&&this.ws){let t={type:y.PONG,origin:g.CLIENT,timestamp:Date.now()/1e3,event_id:e.event_id},s=JSON.stringify(t);this.ws.send(s)}}catch(t){console.error("Error handling ping:",t)}}};function I(i){if(typeof Buffer<"u"&&Buffer.from){let e=Buffer.from(i,"base64"),t=new Uint8Array(e.length);for(let s=0;s<e.length;s++)t[s]=e[s];return t}else{let e=atob(i),t=new Uint8Array(e.length);for(let s=0;s<e.length;s++)t[s]=e.charCodeAt(s);return t}}function Q(i){if(typeof Buffer<"u"&&Buffer.isBuffer&&Buffer.isBuffer(i))return i.toString("base64");let e;if(i instanceof ArrayBuffer?e=new Uint8Array(i):i instanceof Uint8Array?e=i:e=new Uint8Array(i),typeof Buffer<"u"&&Buffer.from)return Buffer.from(e).toString("base64");{let t="";for(let s=0;s<e.length;s++)t+=String.fromCharCode(e[s]);return btoa(t)}}var U=class{queue=[];shouldStop=!1;processing=!1;handler;resolveWaiting;sampleRate;headroomMs;sleepTimer;resolveSleep;constructor(e,t){this.handler=e,this.sampleRate=t?.sampleRate??16e3,this.headroomMs=t?.headroomMs??30}enqueue(e){this.queue.push(e),this.resolveWaiting&&(this.resolveWaiting(),this.resolveWaiting=void 0)}start(){this.processing||(this.shouldStop=!1,this.processing=!0,this.processQueue())}stop(){this.shouldStop=!0,this.processing=!1,this.cancelSleep(),this.resolveWaiting&&(this.resolveWaiting(),this.resolveWaiting=void 0)}clear(){this.queue=[],this.cancelSleep()}get length(){return this.queue.length}chunkDurationMs(e){if(!e.audio_base64)return 0;try{let s=I(e.audio_base64).length/2,a=e.sample_rate??this.sampleRate;return s/a*1e3}catch{return 0}}cancelSleep(){this.sleepTimer!=null&&(clearTimeout(this.sleepTimer),this.sleepTimer=void 0),this.resolveSleep&&(this.resolveSleep(),this.resolveSleep=void 0)}sleep(e){return e<=0?Promise.resolve():new Promise(t=>{this.resolveSleep=t,this.sleepTimer=setTimeout(()=>{this.sleepTimer=void 0,this.resolveSleep=void 0,t()},e)})}async processQueue(){for(;!this.shouldStop;){for(;this.queue.length>0&&!this.shouldStop;){let e=this.queue.shift(),t=this.chunkDurationMs(e);try{await this.handler(e)}catch(a){console.error("Error processing audio message:",a)}if(this.shouldStop)break;let s=t-this.headroomMs;s>0&&await this.sleep(s)}if(this.shouldStop)break;await new Promise(e=>{this.resolveWaiting=e})}this.processing=!1}};var C=class i extends _{audioInterface;audioCallback;audioLevelCallback;audioQueue;audioWarningLogged=!1;_isMuted=!1;silenceInterval=null;silenceChunk=null;static SILENCE_RMS_THRESHOLD=.01;utteranceCompleted=!1;playbackAudioMs=0;playbackStartedAt=0;playbackDrainTimer=null;constructor(e){super({apiKey:e.apiKey,config:e.config,eventCallback:e.eventCallback,startCallback:e.startCallback,endCallback:e.endCallback,textCallback:e.textCallback,transcriptCallback:e.transcriptCallback,stateCallback:e.stateCallback,telemetryCallback:e.telemetryCallback,baseUrl:e.baseUrl,platform:e.platform,customHeaders:e.customHeaders}),this.audioCallback=e.audioCallback,this.audioInterface=e.audioInterface,this.audioLevelCallback=e.audioLevelCallback,this.audioQueue=new U(async t=>{await this.handleAudio(t)},{sampleRate:e.config.output_sample_rate})}static SILENCE_CHUNK_MS=30;static SILENCE_INTERVAL_MS=25;getSilenceChunk(){if(!this.silenceChunk){let t=Math.floor(this.config.input_sample_rate*(i.SILENCE_CHUNK_MS/1e3))*2;this.silenceChunk=new Uint8Array(t)}return this.silenceChunk}startSilenceLoop(){this.silenceInterval===null&&(this.silenceInterval=setInterval(async()=>{if(this._isMuted&&!this.isWsClosed())try{await this.sendAudio(this.getSilenceChunk())}catch{}},i.SILENCE_INTERVAL_MS))}stopSilenceLoop(){this.silenceInterval!==null&&(clearInterval(this.silenceInterval),this.silenceInterval=null)}mute(){this._isMuted=!0,this.startSilenceLoop(),this.emitTelemetry("user_muted",{})}unmute(){this._isMuted=!1,this.stopSilenceLoop(),this.emitTelemetry("user_unmuted",{})}get isMuted(){return this._isMuted}calculateRMS(e){try{let t=I(e),s=new Int16Array(t.buffer,t.byteOffset,t.length/2);if(s.length===0)return 0;let a=0;for(let n=0;n<s.length;n++){let u=s[n]/32768;a+=u*u}return Math.sqrt(a/s.length)}catch(t){return console.error("[SDK] Error calculating RMS:",t),0}}hasActualSpeech(e){return this.calculateRMS(e)>i.SILENCE_RMS_THRESHOLD}calculateAudioLevel(e){let t=Math.floor(e.length/2);if(t<=0)return{rms:0,peak:0,db:-120};let s=new Int16Array(e.buffer,e.byteOffset,t),a=0,n=0;for(let o=0;o<s.length;o++){let d=s[o]/32768,r=Math.abs(d);r>n&&(n=r),a+=d*d}let u=Math.sqrt(a/s.length),l=20*Math.log10(Math.max(u,1e-8));return{rms:u,peak:n,db:l}}async sendAudio(e){if(this.isWsClosed())throw new Error("WebSocket is not connected");let t=Q(e),s={type:y.AUDIO_CHUNK,origin:g.CLIENT,timestamp:Date.now()/1e3,audio_base64:t,format:L.LINEAR16,sample_rate:this.config.input_sample_rate};if(this.websocketSendQueue.push(s),await this.flushSendQueue(),!this.firstAudioSent&&this.sessionStartTime){this.firstAudioSent=!0;let a=Date.now()-this.sessionStartTime;this.emitTelemetry("first_audio_packet_sent",{latencyMs:a})}}modifySignedUrlString(e){let t=this.addQueryParam(e,"input_sample_rate",String(this.config.input_sample_rate));return t=this.addQueryParam(t,"output_sample_rate",String(this.config.output_sample_rate)),t}augmentWsUrlWithParams(e){return this.addQueryParam(e,"interaction_type","call")}async onStop(){this.stopSilenceLoop(),this._isMuted=!1,this.clearPlaybackDrainTimer(),this.resetPlaybackTracking(),this.utteranceCompleted=!1,this.audioQueue.stop(),this.audioInterface&&(await this.audioInterface.stop(),this.emitTelemetry("audio_interface_stopped",{}))}async onWebSocketOpen(){this.audioInterface&&(this.emitTelemetry("audio_interface_started",{}),"setOutputLevelCallback"in this.audioInterface&&this.audioLevelCallback&&this.audioInterface.setOutputLevelCallback(t=>{this.getState()===h.SPEAKING&&this.audioLevelCallback({direction:"output",rms:t.rms,peak:t.peak,db:t.db,sampleRate:this.config.output_sample_rate})}),await this.audioInterface.start(async(t,s)=>{try{if(this.audioLevelCallback&&this.getState()!==h.SPEAKING){let{rms:a,peak:n,db:u}=this.calculateAudioLevel(t);this.audioLevelCallback({direction:"input",rms:a,peak:n,db:u,sampleRate:this.config.input_sample_rate})}this.ws&&this.ws.readyState===1&&!this._isMuted&&await this.sendAudio(t)}catch(a){console.error("Error in audio input callback:",a),this.emitTelemetry("error",{type:"audio_capture",message:a instanceof Error?a.message:String(a)})}})),this.audioQueue.start()}async handleCustomMessage(e){if(e.type===f.AUDIO_CHUNK){let t=e;if(!this.firstAudioReceived&&t.audio_base64&&this.sessionStartTime){this.firstAudioReceived=!0;let s=Date.now()-this.sessionStartTime;this.emitTelemetry("first_audio_packet_received",{latencyMs:s})}if(t.status===R.COMPLETED)this.utteranceCompleted=!0,this.scheduleListeningTransition();else if(t.status===R.PENDING&&t.audio_base64){this.utteranceCompleted=!1,this.clearPlaybackDrainTimer();let a=I(t.audio_base64).length/2/this.config.output_sample_rate*1e3;this.playbackStartedAt===0&&(this.playbackStartedAt=Date.now()),this.playbackAudioMs+=a,this.hasActualSpeech(t.audio_base64)&&this.getState()!==h.SPEAKING&&this.setState(h.SPEAKING)}this.audioQueue.enqueue(t)}else e.type===f.USER_INTERRUPT?(this.utteranceCompleted=!1,this.clearPlaybackDrainTimer(),this.playbackAudioMs=0,this.playbackStartedAt=0,this.setState(h.LISTENING),this.emitTelemetry("user_interrupted",{}),this.audioQueue.clear(),this.audioInterface&&this.audioInterface.interrupt(),await this.handleEvent(e)):await this.handleEvent(e)}async handleAudio(e){try{if(!this.audioInterface&&!this.audioCallback){this.audioWarningLogged||(console.warn("No audio interface or callback provided. Audio messages will be ignored."),this.audioWarningLogged=!0);return}if(e.audio_base64){let t=I(e.audio_base64);if(this.audioLevelCallback&&this.audioInterface&&!("setOutputLevelCallback"in this.audioInterface)&&this.getState()===h.SPEAKING){let{rms:s,peak:a,db:n}=this.calculateAudioLevel(t);this.audioLevelCallback({direction:"output",rms:s,peak:a,db:n,sampleRate:this.config.output_sample_rate})}this.audioInterface&&await this.audioInterface.output(t,this.config.output_sample_rate)}this.audioCallback&&await this.audioCallback(e)}catch(t){console.error("Error handling audio message:",t),this.emitTelemetry("error",{type:"audio_playback",message:t instanceof Error?t.message:String(t)})}}clearPlaybackDrainTimer(){this.playbackDrainTimer&&(clearTimeout(this.playbackDrainTimer),this.playbackDrainTimer=null)}scheduleListeningTransition(){if(this.clearPlaybackDrainTimer(),this.getState()!==h.SPEAKING){this.resetPlaybackTracking();return}let e=this.playbackStartedAt>0?Date.now()-this.playbackStartedAt:0,t=Math.max(0,this.playbackAudioMs-e)+200;this.playbackDrainTimer=setTimeout(()=>{this.playbackDrainTimer=null,this.getState()===h.SPEAKING&&this.utteranceCompleted&&(this.utteranceCompleted=!1,this.resetPlaybackTracking(),this.setState(h.LISTENING))},t)}resetPlaybackTracking(){this.playbackAudioMs=0,this.playbackStartedAt=0}async start(){this.audioWarningLogged=!1,await super.start()}};var x=class extends _{constructor(e){super({apiKey:e.apiKey,config:e.config,eventCallback:e.eventCallback,startCallback:e.startCallback,endCallback:e.endCallback,textCallback:e.textCallback,transcriptCallback:e.transcriptCallback,stateCallback:e.stateCallback,telemetryCallback:e.telemetryCallback,baseUrl:e.baseUrl,platform:e.platform,customHeaders:e.customHeaders})}async sendText(e){if(this.isWsClosed())throw new Error("WebSocket is not connected");let t={type:y.TEXT,origin:g.CLIENT,timestamp:Date.now()/1e3,text:e};this.websocketSendQueue.push(t),await this.flushSendQueue()}};var A=class{agent;constructor(e){let t=e.config.interaction_type,s=e.baseUrl||"https://apps.sarvam.ai/api/app-runtime/";if(t===b.CALL){if(!e.audioInterface)throw new Error(`audioInterface is required for CALL interactions. Please provide an audioInterface instance:
+  - For web/browser: new BrowserAudioInterface()
+  - For React Native: new RNAudioInterface()
+Example: new ConversationAgent({ audioInterface: new BrowserAudioInterface(), ... })`);this.agent=new C({apiKey:e.apiKey,config:e.config,audioInterface:e.audioInterface,audioCallback:e.audioCallback,audioLevelCallback:e.audioLevelCallback,eventCallback:e.eventCallback,startCallback:e.startCallback,endCallback:e.endCallback,textCallback:e.textCallback,transcriptCallback:e.transcriptCallback,stateCallback:e.stateCallback,telemetryCallback:e.telemetryCallback,platform:e.platform,baseUrl:s,customHeaders:e.customHeaders})}else if(t===b.CHAT)this.agent=new x({apiKey:e.apiKey,config:e.config,eventCallback:e.eventCallback,startCallback:e.startCallback,endCallback:e.endCallback,textCallback:e.textCallback,transcriptCallback:e.transcriptCallback,stateCallback:e.stateCallback,telemetryCallback:e.telemetryCallback,platform:e.platform,baseUrl:s,customHeaders:e.customHeaders});else throw new Error(`Unsupported interaction_type: ${t}. Supported types are: ${b.CALL}, ${b.CHAT}`)}get reference_id(){return this.agent.reference_id}set reference_id(e){this.agent.reference_id=e}async start(){await this.agent.start()}async stop(){await this.agent.stop()}async waitForDisconnect(){await this.agent.waitForDisconnect()}async waitForConnect(e){return await this.agent.waitForConnect(e)}isConnected(){return this.agent.isConnected()}getInteractionId(){return this.agent.getInteractionId()}getState(){return this.agent.getState()}async sendAudio(e){if(this.agent instanceof C)await this.agent.sendAudio(e);else throw new Error("sendAudio() is only available for voice/call interactions")}async sendText(e){if(this.agent instanceof x)await this.agent.sendText(e);else throw new Error("sendText() is only available for text/chat interactions")}mute(){if(this.agent instanceof C)this.agent.mute();else throw new Error("mute() is only available for voice/call interactions")}unmute(){if(this.agent instanceof C)this.agent.unmute();else throw new Error("unmute() is only available for voice/call interactions")}isMuted(){return this.agent instanceof C?this.agent.isMuted:!1}getAgentType(){return this.agent instanceof C?"voice":"text"}isVoiceAgent(){return this.agent instanceof C}isTextAgent(){return this.agent instanceof x}};async function q(i,e,t){let s=new A({apiKey:e,config:i,audioInterface:t?.audioInterface,audioCallback:t?.audioCallback,eventCallback:t?.eventCallback,textCallback:t?.textCallback,transcriptCallback:t?.transcriptCallback,stateCallback:t?.stateCallback,telemetryCallback:t?.telemetryCallback,startCallback:t?.startCallback,endCallback:t?.endCallback,baseUrl:t?.baseUrl,platform:t?.platform,customHeaders:t?.customHeaders});return await s.start(),s}var O=class{audioContext;mediaStream;inputWorklet;sourceNode;inputCallback;sampleRate;isRecording=!1;inputGainNode;inputResampleIdx=0;inputResamplePrev=0;inputChunkMs=30;inputChunkBytes=0;inputByteRing;inputByteRingSize=0;inputByteWrite=0;inputByteRead=0;inputByteCount=0;playbackContext;nextPlayTime=0;activeSources=new Set;outputLevelCallback;outputGainNode;outputGain;removeUnlockListeners;constructor(e=16e3,t={}){this.sampleRate=e,this.outputLevelCallback=t.outputLevelCallback,this.outputGain=t.outputGain??1}setOutputLevelCallback(e){this.outputLevelCallback=e}setOutputGain(e){this.outputGain=e,this.outputGainNode&&(this.outputGainNode.gain.value=e)}getOutputGain(){return this.outputGain}async start(e){this.inputCallback=e,this.audioContext=new AudioContext,this.playbackContext=new AudioContext,this.outputGainNode=this.playbackContext.createGain(),this.outputGainNode.gain.value=this.outputGain,this.outputGainNode.connect(this.playbackContext.destination),this.armUnlockListeners(),await this.tryResumeContext(this.audioContext),await this.tryResumeContext(this.playbackContext),this.inputChunkBytes=Math.floor(this.sampleRate*this.inputChunkMs/1e3)*2,this.inputByteRingSize=Math.max(this.inputChunkBytes*50,this.inputChunkBytes*2),this.inputByteRing=new Uint8Array(this.inputByteRingSize),this.inputByteWrite=0,this.inputByteRead=0,this.inputByteCount=0,this.inputResampleIdx=0,this.inputResamplePrev=0,this.nextPlayTime=0,this.mediaStream=await this.getMicStreamWithFallback(),this.sourceNode=this.audioContext.createMediaStreamSource(this.mediaStream),await this.setupInputWorklet(),this.isRecording=!0}async stop(){this.isRecording=!1,this.removeUnlockListeners?.(),this.removeUnlockListeners=void 0,this.mediaStream?.getTracks().forEach(e=>e.stop()),this.mediaStream=void 0,this.inputWorklet?.disconnect(),this.inputWorklet=void 0,this.inputGainNode?.disconnect(),this.inputGainNode=void 0,this.sourceNode?.disconnect(),this.sourceNode=void 0,this.interrupt(),this.outputGainNode?.disconnect(),this.outputGainNode=void 0,this.audioContext&&(await this.audioContext.close(),this.audioContext=void 0),this.playbackContext&&(await this.playbackContext.close(),this.playbackContext=void 0),this.inputByteRing=void 0,this.inputByteRingSize=0,this.inputByteWrite=0,this.inputByteRead=0,this.inputByteCount=0}async output(e,t=16e3){if(!this.playbackContext)return;this.playbackContext.state==="suspended"&&await this.playbackContext.resume();let s=this.decodeInt16PCM(e);if(s.length===0)return;let a=this.playbackContext.sampleRate,n=t===a?s:this.resampleForOutput(s,t,a),u=this.playbackContext.createBuffer(1,n.length,a);u.getChannelData(0).set(n);let l=this.playbackContext.createBufferSource();l.buffer=u,this.outputGainNode?l.connect(this.outputGainNode):l.connect(this.playbackContext.destination),this.activeSources.add(l),l.onended=()=>this.activeSources.delete(l);let o=this.playbackContext.currentTime;if(this.nextPlayTime<=o&&(this.nextPlayTime=o),l.start(this.nextPlayTime),this.nextPlayTime+=u.duration,this.outputLevelCallback){let d=0,r=0;for(let m=0;m<n.length;m++){let N=Math.abs(n[m]);N>r&&(r=N),d+=n[m]*n[m]}let c=Math.sqrt(d/n.length),p=20*Math.log10(Math.max(c,1e-8));this.outputLevelCallback({rms:c,peak:r,db:p})}}interrupt(){for(let e of this.activeSources)try{e.stop()}catch{}this.activeSources.clear(),this.nextPlayTime=0}async setupInputWorklet(){if(!this.audioContext||!this.sourceNode)return;await this.loadWorklet(this.audioContext,`
+      class Capture extends AudioWorkletProcessor {
+        process(inputs) {
+          const ch = inputs[0]?.[0];
+          if (ch) this.port.postMessage(ch.slice(0));
+          return true;
+        }
+      }
+      registerProcessor('capture', Capture);
+    `),this.inputWorklet=new AudioWorkletNode(this.audioContext,"capture"),this.inputWorklet.port.onmessage=t=>{if(!this.isRecording||!this.inputCallback)return;let s=t.data;this.handleCapturedSamples(s).catch(()=>{})},this.sourceNode.connect(this.inputWorklet),this.inputGainNode=this.audioContext.createGain(),this.inputGainNode.gain.value=0,this.inputWorklet.connect(this.inputGainNode),this.inputGainNode.connect(this.audioContext.destination)}resampleForOutput(e,t,s){if(e.length===0||t===s)return e;let a=t/s,n=Math.ceil(e.length/a),u=new Float32Array(n);for(let l=0;l<n;l++){let o=l*a,d=Math.floor(o),r=o-d,c=e[Math.min(d,e.length-1)],p=e[Math.min(d+1,e.length-1)];u[l]=c+(p-c)*r}return u}async loadWorklet(e,t){let s=new Blob([t],{type:"application/javascript"}),a=URL.createObjectURL(s);try{await e.audioWorklet.addModule(a);return}catch{}finally{URL.revokeObjectURL(a)}let n=this.toDataUrl(t);await e.audioWorklet.addModule(n)}async getMicStreamWithFallback(){let e={channelCount:1,echoCancellation:!0,noiseSuppression:!0,autoGainControl:!0};try{return await navigator.mediaDevices.getUserMedia({audio:{...e,sampleRate:this.sampleRate}})}catch{try{return await navigator.mediaDevices.getUserMedia({audio:{...e}})}catch{return await navigator.mediaDevices.getUserMedia({audio:!0})}}}async handleCapturedSamples(e){this.audioContext&&this.audioContext.state==="suspended"&&await this.tryResumeContext(this.audioContext);let t=this.audioContext?.sampleRate||this.sampleRate,s=t===this.sampleRate?e:this.resampleFloat32(e,t,this.sampleRate);this.enqueuePcmBytes(s),await this.flushInputChunks()}enqueuePcmBytes(e){if(!(!this.inputByteRing||this.inputByteRingSize<=0))for(let t=0;t<e.length;t++){let s=Math.max(-1,Math.min(1,e[t])),a=Math.round(s<0?s*32768:s*32767);this.writeInputByte(a&255),this.writeInputByte(a>>8&255)}}writeInputByte(e){this.inputByteRing&&(this.inputByteRing[this.inputByteWrite]=e,this.inputByteWrite=(this.inputByteWrite+1)%this.inputByteRingSize,this.inputByteCount<this.inputByteRingSize?this.inputByteCount++:this.inputByteRead=(this.inputByteRead+1)%this.inputByteRingSize)}async flushInputChunks(){if(!(!this.inputCallback||!this.inputByteRing||this.inputChunkBytes<=0))for(;this.inputByteCount>=this.inputChunkBytes;){let e=new Uint8Array(this.inputChunkBytes);for(let t=0;t<e.length;t++)e[t]=this.inputByteRing[this.inputByteRead],this.inputByteRead=(this.inputByteRead+1)%this.inputByteRingSize;this.inputByteCount-=this.inputChunkBytes,await this.inputCallback(e,e.length/2)}}resampleFloat32(e,t,s){if(e.length===0||t===s)return e;let a=t/s,n=Math.max(0,Math.floor((e.length-this.inputResampleIdx)/a)+2),u=new Float32Array(n),l=0,o=this.inputResampleIdx;for(;o<e.length;){let d=Math.floor(o),r=o-d,c=d===0?this.inputResamplePrev:e[d-1],p=e[d];u[l++]=c+(p-c)*r,o+=a}return this.inputResampleIdx=o-e.length,this.inputResamplePrev=e[e.length-1],u.subarray(0,l)}armUnlockListeners(){if(typeof document>"u"||this.removeUnlockListeners)return;let e=()=>{this.tryResumeContext(this.audioContext),this.tryResumeContext(this.playbackContext);let s=!this.audioContext||this.audioContext.state==="running",a=!this.playbackContext||this.playbackContext.state==="running";s&&a&&(this.removeUnlockListeners?.(),this.removeUnlockListeners=void 0)},t={capture:!0,passive:!0};document.addEventListener("pointerdown",e,t),document.addEventListener("keydown",e,t),document.addEventListener("touchstart",e,t),this.removeUnlockListeners=()=>{document.removeEventListener("pointerdown",e,t),document.removeEventListener("keydown",e,t),document.removeEventListener("touchstart",e,t)}}async tryResumeContext(e){if(!(!e||e.state==="running"))try{await e.resume()}catch{}}toDataUrl(e){let t=new TextEncoder().encode(e),s="",a=32768;for(let n=0;n<t.length;n+=a)s+=String.fromCharCode(...t.subarray(n,n+a));return`data:application/javascript;base64,${btoa(s)}`}decodeInt16PCM(e){let t=e;if(e.length>=44&&e[0]===82&&e[1]===73&&e[2]===70&&e[3]===70){let n=12;for(;n+8<=e.length;){let u=String.fromCharCode(e[n],e[n+1],e[n+2],e[n+3]),l=e[n+4]|e[n+5]<<8|e[n+6]<<16|e[n+7]<<24;if(u==="data"){t=e.slice(n+8,Math.min(n+8+l,e.length));break}n+=8+l+l%2}}t.length%2!==0&&(t=t.slice(0,-1));let s=t.length/2,a=new Float32Array(s);for(let n=0;n<s;n++){let u=t[n*2],l=t[n*2+1],o=u|l<<8;o>=32768&&(o-=65536),a[n]=o/32768}return a}};window.SarvamConv=M;})();
+
+</script>
+<script>
+/* ===== Pharma.com core: inventory seed + multilingual command parser ===== */
+
+const SEED = [
+// id, name, generic, form, pack, packName, unitName, mrp, stockPacks, rack, batch, expiry, rx, reorderPacks, aliases
+['dolo650','Dolo 650','Paracetamol 650 mg','tab',15,'strip','tab',33.6,48,'A1','DL24117','2027-08',0,10,['dolo']],
+['crocin','Crocin Advance','Paracetamol 500 mg','tab',15,'strip','tab',22,0,'A1','CR24502','2027-03',0,10,['crocin','krosin']],
+['calpol','Calpol 500','Paracetamol 500 mg','tab',15,'strip','tab',16.5,22,'A1','CP25010','2027-11',0,8,['calpol']],
+['combiflam','Combiflam','Ibuprofen 400 mg + Paracetamol 325 mg','tab',20,'strip','tab',45.6,30,'A2','CF24889','2027-05',0,8,[]],
+['saridon','Saridon','Propyphenazone + Paracetamol + Caffeine','tab',10,'strip','tab',42,25,'A2','SD25031','2028-01',0,8,[]],
+['disprin','Disprin','Aspirin 350 mg','tab',10,'strip','tab',10.5,40,'A2','DP24770','2026-10',0,10,[]],
+['brufen400','Brufen 400','Ibuprofen 400 mg','tab',15,'strip','tab',21.8,18,'A3','BF24612','2027-09',0,6,['brufen']],
+['zerodolp','Zerodol-P','Aceclofenac 100 mg + Paracetamol 325 mg','tab',10,'strip','tab',68,20,'A3','ZP25044','2027-12',1,6,['zerodol p','zerodol']],
+['azithral500','Azithral 500','Azithromycin 500 mg','tab',3,'strip','tab',119.5,24,'B1','AZ24930','2027-04',1,6,['azithral','azithromycin']],
+['augmentin625','Augmentin 625 Duo','Amoxicillin 500 mg + Clavulanic acid 125 mg','tab',10,'strip','tab',223.4,12,'B1','AG24301','2027-02',1,4,['augmentin','augmentin 625']],
+['mox500','Mox 500','Amoxicillin 500 mg','cap',10,'strip','cap',82,15,'B1','MX24555','2027-07',1,5,['mox']],
+['ciplox500','Ciplox 500','Ciprofloxacin 500 mg','tab',10,'strip','tab',40.6,14,'B2','CX25012','2027-10',1,5,['ciplox']],
+['taximo200','Taxim-O 200','Cefixime 200 mg','tab',10,'strip','tab',109.8,10,'B2','TX24877','2027-01',1,4,['taxim o','taxim']],
+['pan40','Pan 40','Pantoprazole 40 mg','tab',15,'strip','tab',155,35,'C1','PN24990','2027-09',0,10,['pantoprazole']],
+['pand','Pan-D','Pantoprazole 40 mg + Domperidone 30 mg','cap',15,'strip','cap',199.5,28,'C1','PD25005','2027-11',0,8,['pan d']],
+['omez20','Omez 20','Omeprazole 20 mg','cap',20,'strip','cap',62.3,20,'C1','OM24718','2027-06',0,6,['omez','omeprazole']],
+['rantac150','Rantac 150','Ranitidine 150 mg','tab',20,'strip','tab',40,3,'C2','RT24402','2026-12',0,6,['rantac']],
+['digene','Digene Gel','Antacid gel, mint, 200 ml','syrup',1,'bottle','bottle',165,12,'C2','DG25033','2026-12',0,4,['digene']],
+['cetzine','Cetzine 10','Cetirizine 10 mg','tab',10,'strip','tab',19.3,40,'D1','CZ24661','2026-11',0,10,['cetzine','cetirizine','setzine']],
+['allegra120','Allegra 120','Fexofenadine 120 mg','tab',10,'strip','tab',229,9,'D1','AL24810','2027-05',0,4,['allegra']],
+['montairlc','Montair LC','Montelukast 10 mg + Levocetirizine 5 mg','tab',10,'strip','tab',235.5,16,'D1','ML24733','2027-03',1,5,['montair']],
+['sinarest','Sinarest','Paracetamol + Phenylephrine + Chlorpheniramine','tab',10,'strip','tab',60.4,22,'D2','SN25018','2026-11',0,6,[]],
+['benadryl','Benadryl Syrup','Diphenhydramine cough syrup, 100 ml','syrup',1,'bottle','bottle',130,14,'D2','BN24590','2026-11',0,4,['benadryl']],
+['ascorills','Ascoril LS','Ambroxol + Levosalbutamol + Guaifenesin, 100 ml','syrup',1,'bottle','bottle',118,10,'D2','AS24947','2027-06',1,4,['ascoril']],
+['vicksaction','Vicks Action 500','Paracetamol + Phenylephrine + Caffeine','tab',10,'strip','tab',47,30,'D3','VA25022','2028-02',0,8,['vicks']],
+['glycomet500','Glycomet 500 SR','Metformin 500 mg','tab',20,'strip','tab',35.2,45,'E1','GM24877','2027-09',1,10,['glycomet','metformin']],
+['janumet','Janumet 50/500','Sitagliptin 50 mg + Metformin 500 mg','tab',15,'strip','tab',460,8,'E1','JN24620','2027-02',1,3,['janumet']],
+['amaryl1','Amaryl 1','Glimepiride 1 mg','tab',30,'strip','tab',135.6,12,'E1','AM24733','2027-07',1,4,['amaryl','glimepiride']],
+['telma40','Telma 40','Telmisartan 40 mg','tab',30,'strip','tab',240,20,'E2','TL25001','2027-11',1,6,['telma','telmisartan']],
+['amlong5','Amlong 5','Amlodipine 5 mg','tab',15,'strip','tab',55.2,18,'E2','AN24812','2027-08',1,6,['amlong','amlodipine']],
+['ecosprin75','Ecosprin 75','Aspirin 75 mg','tab',14,'strip','tab',5.3,60,'E2','EC24955','2027-10',0,10,['ecosprin']],
+['atorva10','Atorva 10','Atorvastatin 10 mg','tab',15,'strip','tab',109.5,16,'E3','AT24688','2027-05',1,5,['atorva','atorvastatin']],
+['rosuvas10','Rosuvas 10','Rosuvastatin 10 mg','tab',15,'strip','tab',290,10,'E3','RS24577','2027-04',1,4,['rosuvas','rosuvastatin']],
+['thyronorm50','Thyronorm 50','Thyroxine 50 mcg','tab',100,'bottle','tab',180.5,15,'E3','TN25009','2027-12',1,4,['thyronorm']],
+['shelcal500','Shelcal 500','Calcium 500 mg + Vitamin D3 250 IU','tab',15,'strip','tab',118,25,'F1','SH24744','2027-09',0,6,['shelcal']],
+['becosules','Becosules','Vitamin B-complex + Vitamin C','cap',20,'strip','cap',50,30,'F1','BC24816','2027-06',0,8,[]],
+['neurobionforte','Neurobion Forte','Vitamin B1 + B6 + B12','tab',30,'strip','tab',37.8,35,'F1','NB25027','2028-01',0,8,['neurobion']],
+['limcee','Limcee 500','Vitamin C 500 mg chewable','tab',15,'strip','tab',25,40,'F2','LC24903','2026-12',0,10,['limcee']],
+['zincovit','Zincovit','Multivitamin + Zinc','tab',15,'strip','tab',110,22,'F2','ZV24711','2027-07',0,6,[]],
+['electral','Electral ORS','Oral rehydration salts, 21.8 g','sachet',1,'sachet','sachet',22,80,'F2','EL25040','2027-01',0,20,['electral','ors']],
+['ondem4','Ondem 4','Ondansetron 4 mg','tab',10,'strip','tab',55.6,14,'G1','OD24599','2027-03',1,5,['ondem','ondansetron']],
+['domstal','Domstal 10','Domperidone 10 mg','tab',10,'strip','tab',37.9,20,'G1','DS24822','2027-10',0,6,['domstal']],
+['eldoper','Eldoper','Loperamide 2 mg','cap',10,'strip','cap',27,15,'G1','ED24730','2027-06',0,5,[]],
+['meftalspas','Meftal-Spas','Mefenamic acid 250 mg + Dicyclomine 10 mg','tab',10,'strip','tab',48,26,'G2','MS24966','2027-11',0,8,['meftal spas','meftal']],
+['cyclopam','Cyclopam','Dicyclomine 20 mg + Paracetamol 500 mg','tab',10,'strip','tab',56.3,12,'G2','CY24645','2027-04',0,5,[]],
+['volini','Volini Gel','Diclofenac topical gel, 30 g','gel',1,'tube','tube',125,18,'H1','VL25014','2027-03',0,5,['volini']],
+['betadine','Betadine Ointment','Povidone-iodine 5%, 20 g','ointment',1,'tube','tube',130,10,'H1','BT24788','2027-09',0,4,['betadine']],
+['soframycin','Soframycin','Framycetin 1% cream, 30 g','cream',1,'tube','tube',62,12,'H1','SF24901','2027-12',0,4,[]],
+['candidb','Candid-B','Clotrimazole + Beclomethasone, 15 g','cream',1,'tube','tube',110.5,2,'H2','CB24677','2027-05',1,4,['candid b','candid']],
+['liv52','Liv.52 DS','Herbal liver tonic tablets','tab',60,'bottle','tab',190,9,'H2','LV25036','2028-04',0,3,['liv 52']],
+];
+
+function seedInventory(){
+  const inv = {};
+  SEED.forEach(r=>{
+    const [id,name,generic,form,pack,packName,unitName,mrp,stockPacks,rack,batch,expiry,rx,reorder,aliases]=r;
+    inv[id]={id,name,generic,form,pack,packName,unitName,mrp,stock:stockPacks*pack,rack,batch,expiry,rx:!!rx,reorder:reorder*pack,aliases};
+  });
+  return inv;
+}
+
+/* ---------- Transliteration: Devanagari / Kannada / Telugu -> Latin ---------- */
+const V_IND={0x05:'a',0x06:'aa',0x07:'i',0x08:'ii',0x09:'u',0x0A:'uu',0x0B:'ri',0x0C:'li',0x0D:'e',0x0E:'e',0x0F:'e',0x10:'ai',0x11:'o',0x12:'o',0x13:'o',0x14:'au'};
+const CONS={0x15:'k',0x16:'kh',0x17:'g',0x18:'gh',0x19:'ng',0x1A:'ch',0x1B:'chh',0x1C:'j',0x1D:'jh',0x1E:'ny',0x1F:'t',0x20:'th',0x21:'d',0x22:'dh',0x23:'n',0x24:'t',0x25:'th',0x26:'d',0x27:'dh',0x28:'n',0x29:'n',0x2A:'p',0x2B:'ph',0x2C:'b',0x2D:'bh',0x2E:'m',0x2F:'y',0x30:'r',0x31:'r',0x32:'l',0x33:'l',0x34:'l',0x35:'v',0x36:'sh',0x37:'sh',0x38:'s',0x39:'h',0x58:'q',0x59:'kh',0x5A:'g',0x5B:'z',0x5C:'r',0x5D:'rh',0x5E:'f',0x5F:'y'};
+const MATRA={0x3E:'aa',0x3F:'i',0x40:'ii',0x41:'u',0x42:'uu',0x43:'ri',0x44:'ri',0x45:'e',0x46:'e',0x47:'e',0x48:'ai',0x49:'o',0x4A:'o',0x4B:'o',0x4C:'au',0x4E:'e'};
+const NUKTA={ph:'f',j:'z',k:'q',d:'r',dh:'rh',g:'g',kh:'kh'};
+function blockBase(cp){
+  if(cp>=0x0900&&cp<=0x097F) return 0x0900;
+  if(cp>=0x0C00&&cp<=0x0C7F) return 0x0C00;
+  if(cp>=0x0C80&&cp<=0x0CFF) return 0x0C80;
+  return -1;
+}
+function offIn(ch,base){ if(!ch) return -1; const cp=ch.codePointAt(0); return blockBase(cp)===base ? cp-base : -1; }
+function isLetterOff(o){ return (o>=0x01&&o<=0x4D)||(o>=0x55&&o<=0x5F); }
+function scriptOf(text){
+  for(const ch of text){ const b=blockBase(ch.codePointAt(0)); if(b===0x0900) return 'deva'; if(b===0x0C00) return 'telu'; if(b===0x0C80) return 'knda'; }
+  return 'latn';
+}
+function translit(s){
+  const chars=[...s]; let out='';
+  for(let i=0;i<chars.length;i++){
+    const cp=chars[i].codePointAt(0); const base=blockBase(cp);
+    if(base<0){ out+=chars[i]; continue; }
+    const off=cp-base;
+    if(off>=0x66&&off<=0x6F){ out+=String(off-0x66); continue; }
+    if(off===0x64||off===0x65){ out+=' '; continue; }
+    if(off===0x01||off===0x02){ out+='n'; continue; }
+    if(off===0x03){ out+='h'; continue; }
+    if(V_IND[off]){ out+=V_IND[off]; continue; }
+    if(CONS[off]!==undefined){
+      let c=CONS[off]; let j=i+1;
+      if(offIn(chars[j],base)===0x3C){ c=NUKTA[c]||c; j++; }
+      const n2=offIn(chars[j],base);
+      if(n2===0x4D){ out+=c; i=j; continue; }
+      if(MATRA[n2]){ out+=c+MATRA[n2]; i=j; continue; }
+      const endOfWord=!(n2>=0 && isLetterOff(n2));
+      out += (base===0x0900 && endOfWord) ? c : c+'a';
+      i=j-1; continue;
+    }
+    if(MATRA[off]){ out+=MATRA[off]; continue; }
+  }
+  return out;
+}
+
+/* ---------- Normalisers ---------- */
+function lnorm(w){
+  return w.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/aa+/g,'a').replace(/ii+|ee+/g,'i').replace(/uu+|oo+/g,'u');
+}
+function mnorm(w){
+  let s=lnorm(w);
+  s=s.replace(/ph/g,'f').replace(/z/g,'j').replace(/x/g,'ks').replace(/q/g,'k').replace(/w/g,'v')
+     .replace(/c(?=[eiy])/g,'s').replace(/ch/g,'c').replace(/c/g,'k')
+     .replace(/([kgtdbjsp])h/g,'$1').replace(/y/g,'i').replace(/ai/g,'a').replace(/(.)\1+/g,'$1');
+  return s;
+}
+function displayName(raw){
+  return raw.split(/\s+/).filter(Boolean).map(w=>{
+    if(/[A-Z]/.test(w)) return w;            // keep typed casing
+    w=w.replace(/ii/g,'ee').replace(/uu/g,'oo').replace(/aa/g,'a');
+    return w.charAt(0).toUpperCase()+w.slice(1);
+  }).join(' ');
+}
+
+/* ---------- Word lists (all keys pass through lnorm) ---------- */
+function setOf(str){ const s=new Set(); str.split(/[\s,]+/).filter(Boolean).forEach(w=>s.add(lnorm(w))); return s; }
+const NUMW = {};
+(function(){
+  const add=(v,words)=>words.split(/[\s,]+/).filter(Boolean).forEach(w=>{NUMW[lnorm(w)]=v;});
+  // English
+  'zero one two three four five six seven eight nine ten eleven twelve thirteen fourteen fifteen sixteen seventeen eighteen nineteen'.split(' ').forEach((w,i)=>add(i,w));
+  [['twenty',20],['thirty',30],['forty',40],['fourty',40],['fifty',50],['sixty',60],['seventy',70],['eighty',80],['ninety',90],['hundred',100]].forEach(([w,v])=>add(v,w));
+  // Hindi 1-90 (common spellings)
+  const hi=['ek','do','teen tin','char chaar','panch paanch','chhe chhah chah che chhai chhaha','saat sat','aath','nau no','das dus','gyarah gyara giyarah','barah bara','terah tera','chaudah chauda','pandrah pandra','solah sola','satrah satra','atharah athara attharah','unnis unnees','bees bis','ikkis ikkees','bais baais','teis teees','chaubis chaubees','pachchis pachis pachees','chhabbis chhabbees','sattais','atthais atthaees','untis untees','tees tis','iktis iktees','battis','tetis taintis','chautis','paintis','chhattis','saintis','adtis artis','untalis','chalis chaalis','iktalis','bayalis','tetalis taintalis','chavalis chauvalis','paintalis','chhiyalis','saintalis','adtalis','unchas','pachas pachaas','ikyavan','bavan','tirpan','chauvan','pachpan','chhappan','sattavan','atthavan','unsath','saath','iksath','basath','tirsath','chausath','painsath','chhiyasath','sadsath','adsath','unhattar','sattar','ikhattar','bahattar','tihattar','chauhattar','pachhattar','chhihattar','satattar','athhattar','unasi','assi','ikyasi','bayasi','tirasi','chaurasi','pachasi','chhiyasi','sattasi','athasi','navasi nawasi','nabbe'];
+  hi.forEach((w,i)=>add(i+1,w));
+  add(100,'sau so');
+  // Marathi
+  add(2,'don'); add(5,'pach'); add(6,'saha'); add(10,'daha dahaa'); add(11,'akra'); add(12,'bara'); add(13,'tera'); add(14,'chauda'); add(15,'pandhra'); add(16,'sola'); add(17,'satra'); add(18,'athra'); add(19,'ekonis'); add(20,'vis vees'); add(25,'panchvis'); add(50,'pannas'); add(60,'saath'); add(100,'shambhar');
+  // Kannada
+  add(1,'ondu'); add(2,'eradu'); add(3,'muru mooru'); add(4,'nalku naalku'); add(5,'aidu'); add(6,'aru aaru'); add(7,'elu'); add(8,'entu'); add(9,'ombattu'); add(10,'hattu'); add(11,'hannondu'); add(12,'hanneradu'); add(13,'hadimuru'); add(14,'hadinalku'); add(15,'hadinaidu'); add(16,'hadinaru'); add(17,'hadinelu'); add(18,'hadinentu'); add(19,'hattombattu'); add(20,'ippattu'); add(30,'muvattu'); add(40,'nalavattu nalvattu'); add(50,'aivattu'); add(60,'aravattu'); add(70,'eppattu'); add(80,'embattu'); add(90,'tombattu'); add(100,'nuru nooru');
+  // Telugu
+  add(1,'okati'); add(2,'rendu'); add(3,'mudu moodu'); add(4,'nalugu naalugu'); add(7,'edu'); add(8,'enimidi'); add(9,'tommidi'); add(10,'padi'); add(11,'padakondu'); add(12,'pannendu'); add(13,'padamudu'); add(14,'padnalugu'); add(15,'padihenu'); add(16,'padaharu padahaaru'); add(17,'padihedu'); add(18,'padhenimidi'); add(19,'pantommidi'); add(20,'iravai'); add(30,'muppai'); add(40,'nalabhai nalabai'); add(50,'yabhai yabai'); add(60,'aravai'); add(70,'debbai'); add(80,'enabhai enabai'); add(90,'tombhai'); add(100,'vanda');
+})();
+const HUNDRED = setOf('hundred sau shambhar nuru nooru vanda');
+const AMBIG_NUM = setOf('do no so aru edu tera bara sat sola');  // also common words; need a unit/age next to them
+
+const UNIT_PACK = setOf('strip strips istrip patta patte pattey pate patti pattiyan pattiya pattiyaan bottle bottles botal botl batli bottlu bottil sheesha shishi tube tubes tyub box boxes dabba dabbi packet packets paket pack packs sachet sachets pudiya pouch');
+const UNIT_UNIT = setOf('tablet tablets tab tabs tablate goli goliyan goliya golya golia gulige gulike gulika matre maatre matralu matrelu matra capsule capsules cap caps kapsul');
+const AGE_AFTER = setOf('sal saal sala saalka varsh varsha varshe varshaa varshada varshagalu years year yrs yr yo umar umr vayas vayasu vayassu edlu ellu elu samvatsaralu sanvatsaralu samvatsaram sanvatsaram samvatsaraala old');
+const AGE_BEFORE = setOf('age aged umar umr vayas vayasu vayassu vay');
+const STOP = setOf(`please make create generate bill billing invoice for of and the a an give add to with check is there available do we have print patient name age old years me i want need sell sale total mr mrs ms miss kumari shri smt sir madam mg ml mcg gm g
+ka ki ke ko liye lie liya lia banao bana banado banana banaiye banaye karo kar kardo karna kijiye kariye dedo de dijiye dena chahiye chaiye hai hain he kya nahi naam aur ek wala wali vala vali mein me se par ji sahab bhai unka uska unke iska abhi jaldi dekho batao kitna kitne kitni dawai dawa dava davai medicine bil bill ko hamko mujhe mere mera
+sathi saathi la chi cha che chya kara dya dyaa pahije ahe aahe naav vay ani tyanna tyala yanna
+ge ige madi maadi kodi beku ide ideya illa hesaru mattu avarige dayavittu bekagide
+kosam cheyyandi cheyandi cheyi ivvandi ivvu kavali undi unda ledu peru mariyu garu gariki dayachesi
+stock stok add plus more extra rupees rupay rupaye rs`);
+const MARK_BEFORE = setOf('for patient naam name named mr mrs ms miss shri smt kumari peru hesaru naav');
+const MARK_AFTER = setOf('liye lie liya lia ko sathi saathi kosam gariki avarige garu ji');
+const ADD_W = setOf('add jodo jodiye jod daalo dalo aaya aayi aaye aya received receive restock inward purchase kharida vadhava serisi');
+const STOCK_W = setOf('stock stok available availabl uplabdh kitna kitne kitni check left bacha bachi ide ideya unda unnaya undha unnai aahe ahe');
+const BILL_W = setOf('bill bil billing invoice dedo dijiye kodi ivvandi dya sell give');
+const YES_W = setOf('haan han ha hanji yes yeah yep ok okay confirm confirmed theek thik sahi ho hoy haudu houdu hudu avunu aunu sare done print bilkul chalega correct right');
+const NO_W = setOf('nahi nahin na no cancel mat nako naka beda illa vaddu ledu ruko stop galat wrong');
+
+/* ---------- Tokeniser ---------- */
+function tokenize(text){
+  let t = translit(text);
+  t = t.replace(/(\d),(\d)/g,'$1$2')
+       .replace(/([A-Za-z])(\d)/g,'$1 $2').replace(/(\d)([A-Za-z])/g,'$1 $2')
+       .replace(/[^A-Za-z0-9\s]/g,' ');
+  return t.split(/\s+/).filter(Boolean).map((raw,i)=>({i, raw, w:lnorm(raw), m:mnorm(raw), kind:null}));
+}
+
+/* ---------- Levenshtein ---------- */
+function lev(a,b){
+  if(a===b) return 0; const m=a.length,n=b.length; if(!m) return n; if(!n) return m;
+  let prev=new Array(n+1); for(let j=0;j<=n;j++) prev[j]=j;
+  for(let i=1;i<=m;i++){ const cur=[i]; for(let j=1;j<=n;j++){ cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1)); } prev=cur; }
+  return prev[n];
+}
+
+/* ---------- Medicine alias index ---------- */
+function buildIndex(inv){
+  const idx=[]; const firstWordCount={};
+  const meds=Object.values(inv);
+  meds.forEach(m=>{ const fw=mnorm(tokenize(m.name)[0].raw); firstWordCount[fw]=(firstWordCount[fw]||0)+1; });
+  meds.forEach(m=>{
+    const names=new Set([m.name, ...(m.aliases||[])]);
+    const fwTok=tokenize(m.name)[0];
+    if(firstWordCount[fwTok.m]===1 && fwTok.m.length>=4 && !/\d/.test(fwTok.raw)) names.add(fwTok.raw);
+    names.forEach(n=>{
+      const toks=tokenize(n);
+      const joined=toks.map(t=>t.m).join('');
+      const digits=toks.filter(t=>/^\d+$/.test(t.raw)).map(t=>t.raw).join('|');
+      if(joined.length>=3) idx.push({id:m.id, n:toks.length, joined, digits});
+    });
+  });
+  return idx;
+}
+
+function matchMeds(tokens, index){
+  const cands=[];
+  for(let s=0;s<tokens.length;s++){
+    for(let L=1;L<=4 && s+L<=tokens.length;L++){
+      const win=tokens.slice(s,s+L);
+      if(win.every(t=>/^\d+$/.test(t.raw) || NUMW[t.w]!==undefined)) continue;
+      if(STOP.has(win[0].w) && win[0].w.length<=4) continue;
+      const joined=win.map(t=>t.m).join('');
+      const digits=win.filter(t=>/^\d+$/.test(t.raw)).map(t=>t.raw).join('|');
+      for(const a of index){
+        if(Math.abs(a.n-L)>1) continue;
+        if(a.digits && digits && a.digits!==digits) continue;
+        if(!a.digits && digits) continue;
+        const d=lev(joined,a.joined); const score=1-d/Math.max(joined.length,a.joined.length);
+        const min = a.joined.length<=4 ? 0.8 : 0.74;
+        if(score>=min) cands.push({id:a.id,s,e:s+L,score,len:a.joined.length});
+      }
+    }
+  }
+  cands.sort((x,y)=> y.score-x.score || y.len-x.len || (y.e-y.s)-(x.e-x.s));
+  const taken=new Array(tokens.length).fill(false); const used=new Set(); const out=[];
+  for(const c of cands){
+    if(used.has(c.id)) continue;
+    let free=true; for(let k=c.s;k<c.e;k++) if(taken[k]) free=false;
+    if(!free) continue;
+    for(let k=c.s;k<c.e;k++){ taken[k]=true; tokens[k].kind='med'; }
+    used.add(c.id); out.push(c);
+  }
+  return out.sort((a,b)=>a.s-b.s);
+}
+
+/* ---------- Numbers ---------- */
+function findNumbers(tokens){
+  const groups=[];
+  for(let i=0;i<tokens.length;i++){
+    const t=tokens[i]; if(t.kind) continue;
+    if(/^\d+$/.test(t.raw)){ t.kind='num'; groups.push({s:i,e:i+1,val:parseInt(t.raw,10)}); continue; }
+    const v=NUMW[t.w]; if(v===undefined) continue;
+    if(AMBIG_NUM.has(t.w)){
+      const nx=tokens[i+1]; const ok = nx && (UNIT_PACK.has(nx.w)||UNIT_UNIT.has(nx.w)||AGE_AFTER.has(nx.w));
+      if(!ok) continue;
+    }
+    let cur=v, j=i+1;
+    while(j<tokens.length && !tokens[j].kind){
+      const nv=NUMW[tokens[j].w]; if(nv===undefined) break;
+      if(HUNDRED.has(tokens[j].w)){ cur=(cur||1)*100; j++; continue; }
+      if(cur>=100 && cur%100===0 && nv<100){ cur+=nv; j++; continue; }
+      if(cur>=20 && cur<100 && cur%10===0 && nv>0 && nv<10){ cur+=nv; j++; continue; }
+      break;
+    }
+    for(let k=i;k<j;k++) tokens[k].kind='num';
+    groups.push({s:i,e:j,val:cur});
+    i=j-1;
+  }
+  groups.forEach(g=>{
+    const nx=tokens[g.e], pv=tokens[g.s-1];
+    const nx2=tokens[g.e+1];
+    if(nx && UNIT_PACK.has(nx.w)){ g.unit='pack'; nx.kind='unit'; }
+    else if(nx && UNIT_UNIT.has(nx.w)){ g.unit='unit'; nx.kind='unit'; }
+    else if(nx && ['ki','ke','ka','chi','che','cha'].includes(nx.w) && nx2 && (UNIT_PACK.has(nx2.w)||UNIT_UNIT.has(nx2.w))){ g.unit=UNIT_PACK.has(nx2.w)?'pack':'unit'; nx2.kind='unit'; }
+    if(nx && AGE_AFTER.has(nx.w) && !g.unit){ g.age=true; nx.kind='ageword'; }
+    if(pv && AGE_BEFORE.has(pv.w) && pv.kind!=='med' && !g.unit){ g.age=true; pv.kind='ageword'; }
+  });
+  return groups;
+}
+
+/* ---------- Main parse ---------- */
+function parseCommand(text, inv, index, opts={}){
+  const script=scriptOf(text);
+  const tokens=tokenize(text);
+  const res={text, script, tokens, intent:'unknown', items:[], patient:{name:'',age:null}, notes:[]};
+  if(!tokens.length) return res;
+  const ws=new Set(tokens.map(t=>t.w));
+
+  if(opts.pending && tokens.length<=5){
+    const yes=tokens.some(t=>YES_W.has(t.w)), no=tokens.some(t=>NO_W.has(t.w));
+    if(no && !yes){ res.intent='cancel'; return res; }
+    if(yes){ res.intent='confirm'; return res; }
+  }
+
+  const meds=matchMeds(tokens,index);
+  const nums=findNumbers(tokens);
+
+  let ageGroup=nums.find(g=>g.age && g.val>0 && g.val<=120);
+  const strong=nums.filter(g=>!g.age && g.unit);
+  const weak=nums.filter(g=>!g.age && !g.unit);
+
+  const takenQ=new Set();
+  const qty={};
+  if(meds.length && strong.length===meds.length){
+    meds.forEach((m,k)=>{ qty[m.id]=strong[k]; takenQ.add(strong[k]); });
+  } else {
+    const assign=(pool)=>meds.forEach(m=>{
+      if(qty[m.id]) return;
+      let best=null,bd=1e9;
+      pool.forEach(g=>{ if(takenQ.has(g)) return;
+        const d = g.s>=m.e ? g.s-m.e : (m.s-g.e)+0.5;
+        if(d<bd){bd=d;best=g;} });
+      if(best && bd<=6){ qty[m.id]=best; takenQ.add(best); }
+    });
+    assign(strong); assign(weak);
+  }
+  if(!ageGroup){
+    const left=weak.filter(g=>!takenQ.has(g) && g.val>0 && g.val<=110);
+    if(left.length){ ageGroup=left[0]; }
+  }
+  if(ageGroup){ res.patient.age=ageGroup.val; for(let k=ageGroup.s;k<ageGroup.e;k++) tokens[k].kind='num'; }
+
+  res.items=meds.map(m=>{
+    const g=qty[m.id];
+    return {id:m.id, qty:g?g.val:1, unit:g&&g.unit?g.unit:'pack', assumedQty:!g, heard:tokens.slice(m.s,m.e).map(t=>t.raw).join(' ')};
+  });
+
+  // Intent
+  const hasAdd=tokens.some(t=>ADD_W.has(t.w) && t.kind!=='med');
+  const hasStock=tokens.some(t=>STOCK_W.has(t.w) && t.kind!=='med') || (ws.has('hai')&&ws.has('kya')) || (ws.has('ahe')&&ws.has('ka'));
+  const hasBill=tokens.some(t=>BILL_W.has(t.w) && t.kind!=='med');
+
+  // Patient name
+  const isCand=t=>!t.kind && !STOP.has(t.w) && /^[a-z]+$/i.test(t.raw) && t.raw.length>=2 && NUMW[t.w]===undefined && !UNIT_PACK.has(t.w) && !UNIT_UNIT.has(t.w) && !AGE_AFTER.has(t.w) && !YES_W.has(t.w);
+  let nameToks=null;
+  for(let i=0;i<tokens.length && !nameToks;i++){
+    const t=tokens[i]; if(t.kind) continue;
+    if(MARK_BEFORE.has(t.w) && tokens[i+1] && isCand(tokens[i+1])){
+      nameToks=[tokens[i+1]]; if(tokens[i+2]&&isCand(tokens[i+2])) nameToks.push(tokens[i+2]);
+    } else if(MARK_AFTER.has(t.w) && i>0){
+      let k=i-1; if(tokens[k] && tokens[k].w==='ke') k--;
+      const arr=[]; while(k>=0 && isCand(tokens[k]) && arr.length<2){ arr.unshift(tokens[k]); k--; }
+      if(arr.length) nameToks=arr;
+    }
+  }
+  if(!nameToks){
+    const first=tokens.findIndex(isCand);
+    if(first>=0){ nameToks=[tokens[first]]; if(tokens[first+1]&&isCand(tokens[first+1])) nameToks.push(tokens[first+1]); }
+  }
+  if(nameToks){
+    let raw=nameToks.map(t=>t.raw).join(' ');
+    const sfx = script==='knda' ? /(avarige|ge)$/i : script==='telu' ? /(gariki|kosam|ki|ku)$/i : /(sathi|saathi)$/i;
+    const parts=raw.split(' '); const last=parts.pop(); const stripped=last.replace(sfx,'');
+    raw=[...parts, stripped.length>=3?stripped:last].join(' ');
+    res.patient.name=displayName(raw);
+  }
+
+  if(meds.length){
+    if(hasAdd) res.intent='restock';
+    else if(hasStock && !hasBill && !res.patient.age) { res.intent='stock'; res.patient.name=''; }
+    else res.intent='bill';
+  }
+  if(res.intent==='stock' || res.intent==='restock'){ res.patient={name:'',age:null}; }
+  return res;
+}
+
+/* ---------- Sample sales history (demo data, clearly marked) ---------- */
+function sampleBills(inv, now){
+  const T=now||Date.now(), DAY=864e5;
+  const names=['Ramesh','Priya','Imran','Lakshmi','Suresh','Anita','Mohan','Kavya','Farhan','Deepa','Rahul','Meena','Arjun','Sunita'];
+  // [medicine id, qty packs] baskets; popular items repeat so top sellers are clear
+  const baskets=[[['dolo650',2]],[['dolo650',1],['cetzine',1]],[['pan40',2]],[['glycomet500',3]],[['dolo650',3],['electral',4]],[['telma40',1]],[['azithral500',1],['dolo650',1]],[['pand',1]],[['cetzine',2]],[['shelcal500',2]],[['dolo650',2],['pan40',1]],[['glycomet500',2],['amlong5',1]],[['combiflam',1]],[['electral',6]],[['dolo650',1]],[['pan40',1],['digene',1]],[['vicksaction',2]],[['telma40',2]],[['benadryl',1]],[['dolo650',2],['limcee',2]],[['neurobionforte',1]],[['pand',2]],[['glycomet500',1]],[['ecosprin75',3]],[['dolo650',1],['sinarest',1]],[['montairlc',1]],[['pan40',2]],[['cetzine',1],['dolo650',1]]];
+  const out=[];
+  baskets.forEach((b,i)=>{
+    const daysAgo=i<6?0:Math.min(6,1+Math.floor((i-6)/3.7));
+    const at=T-daysAgo*DAY-(i%6)*47*60000-(i*13%50)*60000-30*60000;
+    const lines=b.filter(([id])=>inv[id]).map(([id,q])=>{ const m=inv[id]; return {id,name:m.name,generic:m.generic,batch:m.batch,expiry:m.expiry,rx:m.rx,units:q*m.pack,qtyLabel:q+' '+m.packName+(q>1?'s':''),rate:m.mrp,amount:+(q*m.mrp).toFixed(2)}; });
+    const d=new Date(at), p=n=>String(n).padStart(2,'0');
+    out.push({id:'s'+String(i+1).padStart(2,'0'),no:`SSM/26-27/${p(d.getMonth()+1)}${p(d.getDate())}-S${p(i+1)}`,at,patient:{name:names[i%names.length],age:22+(i*7)%50},payment:['Cash','UPI','UPI','Card'][i%4],lines,total:+lines.reduce((a,l)=>a+l.amount,0).toFixed(2),seconds:+(6+(i*37%90)/10).toFixed(1),engine:'Sample',sample:true,transcript:''});
+  });
+  return out.sort((a,b)=>b.at-a.at);
+}
+
+if(typeof module!=='undefined') module.exports={SEED,seedInventory,sampleBills,translit,tokenize,parseCommand,buildIndex,lnorm,mnorm,scriptOf};
+
+</script>
+<script>
+/* ===== Pharma.com app: UI, data, voice ===== */
+const LS_DB='dawabol.db.v3', LS_SET='dawabol.settings.v2';
+const STORE={name:'Shree Sai Medicals', addr:'12, 4th Block, Jayanagar, Bengaluru 560011', phone:'080-4123 7788', gstin:'29ABCDE1234F1Z5', dl:'KA-B20-123456 / KA-B21-123457'};
+const MANUAL_SECONDS=300;   // typical manual check + bill time per patient (5 min)
+const SARVAM_URL='https://api.sarvam.ai/speech-to-text', SARVAM_MODEL='saaras:v4';
+const LANGS={
+  auto:{label:'Auto',code:'unknown',sr:'hi-IN'},
+  hi:{label:'हिंदी',code:'hi-IN',sr:'hi-IN'},
+  en:{label:'English',code:'en-IN',sr:'en-IN'},
+  mr:{label:'मराठी',code:'mr-IN',sr:'mr-IN'},
+  kn:{label:'ಕನ್ನಡ',code:'kn-IN',sr:'kn-IN'},
+  te:{label:'తెలుగు',code:'te-IN',sr:'te-IN'},
+};
+const EXAMPLES=[
+  ['हिंदी','अभिजीत, 16 साल, Dolo 650 की 10 स्ट्रिप का बिल बनाओ'],
+  ['मराठी','सुनीता साठी 45 वर्षे, Telma 40 च्या 2 स्ट्रिप बिल करा'],
+  ['ಕನ್ನಡ','ರವಿ 32 ವರ್ಷ, Crocin 5 ಸ್ಟ್ರಿಪ್ ಬಿಲ್ ಮಾಡಿ'],
+  ['తెలుగు','లక్ష్మి 60 సంవత్సరాలు, Glycomet 500 3 స్ట్రిప్స్ బిల్ చేయండి'],
+  ['English','Bill 3 strips of Azithral 500 for Priya, 28 years'],
+  ['Stock?','Dolo 650 स्टॉक में है क्या?',1],
+  ['Restock','Pan 40 ki 20 strip stock mein add karo',1],
+];
+const FRAMED=(()=>{ try{ return window.self!==window.top; }catch(e){ return true; } })();
+const IN_ARTIFACT=FRAMED && location.protocol!=='file:';
+const ICON={
+  slip:'<svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6M9 16h3"/></svg>',
+  search:'<svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg>',
+  x:'<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  dots:'<svg viewBox="0 0 24 24"><circle cx="6" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="18" cy="12" r="1.5"/></svg>',
+};
+
+/* ---------- small helpers ---------- */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=n=>'₹'+Number(n).toLocaleString('en-IN',{minimumFractionDigits:2,maximumFractionDigits:2});
+const plural=(n,w)=>`${n} ${w}${n===1?'':'s'}`;
+function load(k){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):null; }catch(e){ return null; } }
+function store(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); }catch(e){} }
+function toast(msg,kind=''){ const t=$('#toast'); t.textContent=msg; t.className='toast show '+kind; clearTimeout(t._h); t._h=setTimeout(()=>t.className='toast',3000); }
+const today=()=>new Date().toDateString();
+const timeStr=ts=>new Date(ts).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
+
+/* ---------- settings ---------- */
+let SET=Object.assign({key:'',lang:'auto',useVoice:true,speak:true,autoPrint:false,keyState:'',agent:{key:'',app:'',org:'',ws:''}},load(LS_SET)||{});
+if(!SET.agent) SET.agent={key:'',app:'',org:'',ws:''};
+const saveSet=()=>store(LS_SET,SET);
+
+/* ---------- data layer: cloud db when available, else this browser ---------- */
+const Data={inv:{},bills:[],log:[],cloud:false,db:null,readOnly:false};
+let INDEX=[], KEYTERMS=[];
+function reindex(){ INDEX=buildIndex(Data.inv); KEYTERMS=Object.values(Data.inv).map(m=>m.name).concat(['strip','tablet','bottle','tube','sachet']); }
+function loadLocal(){
+  const s=load(LS_DB);
+  if(s&&s.inv&&Object.keys(s.inv).length){ Data.inv=s.inv; Data.bills=s.bills||[]; Data.log=s.log||[]; }
+  else { Data.inv=seedInventory(); Data.bills=sampleBills(Data.inv); Data.log=[]; }
+  reindex();
+}
+function saveLocal(){ if(!Data.cloud) store(LS_DB,{inv:Data.inv,bills:Data.bills,log:Data.log}); }
+let writeErrShown=false;
+function cloudErr(e){
+  if(e&&(e.code==='not_granted'||e.code==='revoked')) Data.readOnly=true;
+  if(!writeErrShown){ writeErrShown=true; toast(Data.readOnly?'View-only access. Ask the owner to edit.':'Not saved. Check the connection.','bad'); }
+}
+async function cloudInit(){
+  if(!window.claude||!window.claude.use) return;
+  let db=null; try{ db=await window.claude.use('db'); }catch(e){}
+  if(!db) return;
+  Data.db=db;
+  const timer=setTimeout(()=>{ if(!Data.cloud) renderFoot(); },10000);
+  db.collection('inventory').onSnapshot(snap=>{
+    clearTimeout(timer);
+    if(snap.empty){ renderFoot('Store database is empty. Showing demo stock on this device.'); return; }
+    const inv={}; snap.docs.forEach(d=>{ const v=d.data(); if(v) inv[d.id]=Object.assign({id:d.id},v); });
+    Data.inv=inv; Data.cloud=true; reindex(); renderAll();
+  },()=>{ clearTimeout(timer); renderFoot(); });
+  db.collection('bills').orderBy('at','desc').limit(150).onSnapshot(snap=>{
+    if(!Data.cloud && snap.empty) return;
+    Data.bills=snap.docs.map(d=>Object.assign({_id:d.id},d.data())); renderAll();
+  },()=>{});
+  db.collection('log').orderBy('at','desc').limit(150).onSnapshot(snap=>{
+    if(!Data.cloud && snap.empty) return;
+    Data.log=snap.docs.map(d=>Object.assign({_id:d.id},d.data())); if(view==='insights') renderInsights();
+  },()=>{});
+}
+function persistStock(ids){
+  if(Data.cloud&&Data.db){ ids.forEach(id=>Data.db.doc('inventory/'+id).update({stock:Data.inv[id].stock}).catch(cloudErr)); }
+  else saveLocal();
+}
+function persistBill(b){
+  Data.bills.unshift(b);
+  if(Data.cloud&&Data.db){ Data.db.doc('bills/'+b.id).set(b).catch(cloudErr); } else saveLocal();
+}
+function logEvent(text,meta,intent,outcome){
+  const e={id:'l'+Date.now().toString(36)+Math.random().toString(36).slice(2,6),at:Date.now(),text,engine:meta.engine||'Typed',lang:meta.lang||'',secs:meta.latency!=null?+meta.latency.toFixed(1):null,intent,outcome};
+  Data.log.unshift(e); Data.log=Data.log.slice(0,150);
+  if(Data.cloud&&Data.db){ Data.db.doc('log/'+e.id).set(e).catch(()=>{}); } else saveLocal();
+  if(view==='insights') renderInsights();
+}
+
+/* ---------- medicine helpers ---------- */
+function stockText(m,units=m.stock){
+  if(m.pack===1) return plural(units,m.packName);
+  const p=Math.floor(units/m.pack), r=units%m.pack;
+  return plural(p,m.packName)+(r?` + ${r} ${m.unitName}`:'');
+}
+const unitLabel=(m,unit,qty)=> unit==='pack'||m.pack===1 ? plural(qty,m.packName) : plural(qty,m.unitName);
+const needUnits=(m,it)=> it.unit==='pack'||m.pack===1 ? it.qty*m.pack : it.qty;
+const lineAmt=(m,it)=> it.unit==='pack'||m.pack===1 ? it.qty*m.mrp : it.qty*m.mrp/m.pack;
+function status(m){ if(m.stock<=0) return ['out','Out of stock']; if(m.stock<=m.reorder) return ['low','Reorder']; return ['ok','In stock']; }
+function expiryDate(exp){ const [y,mo]=exp.split('-').map(Number); return new Date(y,mo,0,23,59,59); } // last day of expiry month
+const daysLeft=exp=>Math.floor((expiryDate(exp)-Date.now())/864e5);
+const monthsLeft=exp=>daysLeft(exp)/30;
+function expInfo(exp){ const d=daysLeft(exp); if(d<0) return {d,cls:'bad',txt:'Expired'}; if(d<=30) return {d,cls:'bad',txt:`${d} days left`}; if(d<=90) return {d,cls:'warn',txt:`${d} days left`}; return {d,cls:'ok',txt:d<=365?`${Math.round(d/30)} months`:'> 1 year'}; }
+const isExpired=m=>daysLeft(m.expiry)<0;
+const stockValue=m=>m.stock*m.mrp/m.pack;
+const expLabel=exp=>{ const [y,m]=exp.split('-'); return `${m}/${y.slice(2)}`; };
+const substitutes=(m,units)=>Object.values(Data.inv).filter(x=>x.id!==m.id&&x.generic===m.generic&&x.stock>=Math.max(units,1)&&!isExpired(x)).sort((a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry));
+function itemIssue(it){ const m=Data.inv[it.id]; if(!m) return {k:'gone'}; const need=needUnits(m,it); if(m.stock<=0) return {k:'out',subs:substitutes(m,need)}; if(isExpired(m)) return {k:'expired',subs:substitutes(m,need)}; if(need>m.stock) return {k:'short'}; return null; }
+function billNo(){ const d=new Date(); const y=d.getMonth()>=3?d.getFullYear():d.getFullYear()-1; const p=n=>String(n).padStart(2,'0');
+  return `SSM/${String(y).slice(2)}-${String(y+1).slice(2)}/${p(d.getMonth()+1)}${p(d.getDate())}-${p(d.getHours())}${p(d.getMinutes())}${p(d.getSeconds())}`; }
+function speak(text){
+  if(!SET.speak||AG||!('speechSynthesis' in window)) return;
+  try{ speechSynthesis.cancel(); const u=new SpeechSynthesisUtterance(text); u.lang='en-IN'; u.rate=1.03;
+    const v=speechSynthesis.getVoices().find(v=>v.lang==='en-IN'); if(v) u.voice=v; speechSynthesis.speak(u);}catch(e){}
+}
+
+/* ---------- view routing ---------- */
+const VIEWS=['counter','stock','bills','insights'];
+let view='counter';
+function setView(v){
+  if(!VIEWS.includes(v)) v='counter'; view=v;
+  VIEWS.forEach(x=>{ $('#v-'+x).hidden=x!==v; });
+  document.querySelectorAll('.nav a').forEach(a=>{ if(a.dataset.view===v) a.setAttribute('aria-current','page'); else a.removeAttribute('aria-current'); });
+  if(v==='stock') renderStock(); if(v==='bills') renderBills(); if(v==='insights') renderInsights();
+}
+window.addEventListener('hashchange',()=>setView(location.hash.slice(1)));
+
+/* ---------- slip (the hero) ---------- */
+let slip={mode:'idle'};
+let lastBill=null;
+const slipHeader=()=>`<div class="s-store"><b>${esc(STORE.name)}</b><span>${esc(STORE.addr)}</span></div>`;
+const actionSecondary=b=>IN_ARTIFACT?(Downloads?`<button type="button" data-act="save" data-id="${esc(b.id)}">Save</button>`:''):`<button type="button" data-act="print" data-id="${esc(b.id)}">Print</button>`;
+function renderSlip(){
+  const el=$('#slip');
+  if(slip.mode!=='idle'&&slip.mode!==renderSlip.last&&window.innerWidth<900&&view==='counter') setTimeout(()=>el.scrollIntoView({behavior:'smooth',block:'start'}),30);
+  renderSlip.last=slip.mode;
+  const m=slip.mode;
+  if(m==='idle'){
+    const tb=Data.bills.filter(b=>new Date(b.at).toDateString()===today());
+    const avg=tb.length?(tb.reduce((a,b)=>a+b.seconds,0)/tb.length).toFixed(1):'—';
+    el.innerHTML=`${slipHeader()}<div class="s-empty">${ICON.slip}<span class="big">Next patient</span>
+      <div class="s-today"><div><b>${tb.length}</b><span>bills today</span></div><div><b>${avg}${tb.length?' s':''}</b><span>avg / bill</span></div></div></div>`;
+    return;
+  }
+  if(m==='thinking'){ el.innerHTML=`${slipHeader()}<div class="s-empty">${ICON.dots}<span class="big">Matching…</span></div>`; return; }
+  if(m==='unknown'){
+    el.innerHTML=`${slipHeader()}<div class="s-empty">${ICON.search}<span class="big">No medicine found</span><span>Try the brand name, e.g. “Dolo 650”.</span></div>
+      <div class="s-actions"><div class="s-sec"><button type="button" data-act="done">Back</button></div></div>`;
+    return;
+  }
+  if(m==='draft') return renderDraft(el);
+  if(m==='restock'){
+    el.innerHTML=`${slipHeader()}<div class="s-title"><b>STOCK IN</b></div>
+      <div class="s-items">${slip.items.map(it=>{ const md=Data.inv[it.id]; const add=needUnits(md,it);
+        return `<div class="s-item"><div class="s-name">${esc(md.name)}</div><div class="s-amt">+${esc(unitLabel(md,it.unit,it.qty))}</div><div class="s-meta">${esc(stockText(md))} → ${esc(stockText(md,md.stock+add))} · ${md.rack}</div></div>`; }).join('')}</div>
+      <div class="s-actions"><button type="button" class="s-go" data-act="confirm">Add to stock <kbd>Enter</kbd></button><p class="s-say">or say “haan” · <button type="button" class="link" data-act="cancel">Cancel</button></p></div>`;
+    return;
+  }
+  if(m==='stock'){
+    el.innerHTML=`${slipHeader()}<div class="s-title"><b>STOCK</b></div>${slip.items.map(it=>{ const md=Data.inv[it.id]; const [k,l]=status(md); const subs=md.stock<=0?substitutes(md,1):[];
+      return `<div class="s-card"><div class="s-name">${esc(md.name)} <span class="flag ${k==='ok'?'ok':k==='low'?'warn':'bad'}">${l.toUpperCase()}</span></div><div class="qty">${esc(stockText(md))}</div>
+        <div class="s-meta">Rack ${md.rack} · Exp ${expLabel(md.expiry)} (${expInfo(md.expiry).txt}) · ${money(md.mrp)}/${md.packName}</div>
+        ${subs.length?`<div class="s-fix warn">Same salt: ${subs.map(s=>esc(s.name)).join(', ')}</div>`:''}</div>`; }).join('')}
+      <div class="s-actions">${slip.items.some(it=>Data.inv[it.id].stock>0)?'<button type="button" class="s-go" data-act="billfromstock">Bill this</button>':''}<div class="s-sec"><button type="button" data-act="done">Done</button></div></div>`;
+    return;
+  }
+  if(m==='done') el.innerHTML=receiptHTML(slip.bill,true);
+}
+function renderDraft(el){
+  const total=slip.items.reduce((a,it)=>a+(Data.inv[it.id]?lineAmt(Data.inv[it.id],it):0),0);
+  const blocked=!slip.items.length||slip.items.some(it=>itemIssue(it)||!(it.qty>0));
+  const rows=slip.items.map((it,ix)=>{
+    const md=Data.inv[it.id]; const iss=itemIssue(it);
+    const unitSel=md.pack>1?`<select data-act="unit" data-ix="${ix}" aria-label="Unit"><option value="pack" ${it.unit==='pack'?'selected':''}>${md.packName}</option><option value="unit" ${it.unit==='unit'?'selected':''}>${md.unitName}</option></select>`:`<span>${md.packName}</span>`;
+    let fix='';
+    if(iss&&iss.k==='out') fix=`<div class="s-fix">Out of stock ${iss.subs.slice(0,2).map(s=>`<button type="button" data-act="swap" data-ix="${ix}" data-to="${s.id}">${esc(s.name)} · same salt</button>`).join('')}</div>`;
+    if(iss&&iss.k==='expired') fix=`<div class="s-fix">Expired ${expLabel(md.expiry)} · do not sell ${iss.subs.slice(0,2).map(s=>`<button type="button" data-act="swap" data-ix="${ix}" data-to="${s.id}">${esc(s.name)} · same salt</button>`).join('')}</div>`;
+    if(iss&&iss.k==='short') fix=`<div class="s-fix warn">Only ${esc(stockText(md))} <button type="button" data-act="useavail" data-ix="${ix}">Use available</button></div>`;
+    return `<div class="s-item"><div class="s-name">${esc(md.name)}${md.rx?'<span class="flag rx">Rx</span>':''}${it.assumedQty?'<span class="flag warn">QTY?</span>':''}</div><div class="s-amt">${money(lineAmt(md,it)).slice(1)}</div>
+      <div class="s-meta">${esc(md.generic)} · ${md.rack} · Exp ${expLabel(md.expiry)}${(()=>{const e=expInfo(md.expiry); return e.cls!=='ok'&&e.d>=0?` · ${e.txt}`:'';})()}</div>
+      <div class="s-qty"><span class="step"><button type="button" data-act="dec" data-ix="${ix}" aria-label="Less">−</button><input type="number" id="q${ix}" min="1" value="${it.qty}" data-act="qty" data-ix="${ix}" aria-label="Quantity"><button type="button" data-act="inc" data-ix="${ix}" aria-label="More">+</button></span>${unitSel}<button type="button" class="s-x" data-act="remove" data-ix="${ix}" aria-label="Remove ${esc(md.name)}">${ICON.x}</button></div>${fix}</div>`;
+  }).join('');
+  el.innerHTML=`${slipHeader()}<div class="s-title"><b>BILL</b><span>DRAFT</span></div>
+    <div class="s-patient"><input id="pName" value="${esc(slip.patient.name)}" placeholder="Patient" autocomplete="off" aria-label="Patient name"><input id="pAge" class="age" type="number" min="0" max="120" value="${slip.patient.age??''}" placeholder="Age" aria-label="Age"></div>
+    <hr class="s-rule"><div class="s-items">${rows}</div>
+    <div class="s-add"><select id="addMed" aria-label="Add medicine"><option value="">+ Add medicine</option>${Object.values(Data.inv).sort((a,b)=>a.name.localeCompare(b.name)).map(x=>`<option value="${x.id}">${esc(x.name)}</option>`).join('')}</select></div>
+    <hr class="s-rule"><div class="s-total"><span>TOTAL</span><b>${money(total)}</b></div>
+    <div class="s-pay" role="group" aria-label="Payment">${['Cash','UPI','Card'].map(p=>`<button type="button" data-act="pay" data-p="${p}" aria-pressed="${slip.payment===p}">${p}</button>`).join('')}</div>
+    <div class="s-actions"><button type="button" class="s-go" data-act="confirm" ${blocked?'disabled':''}>Confirm <kbd>Enter</kbd></button>
+      <p class="s-say">or say “haan” · <button type="button" class="link" data-act="cancel">Cancel</button></p></div>`;
+}
+function receiptHTML(b,live){
+  const d=new Date(b.at); const rx=b.lines.some(l=>l.rx);
+  const actions=live?`<div class="s-speed">Billed in <b>${b.seconds} s</b></div>
+    <div class="s-actions"><button type="button" class="s-go" data-act="next">Next patient</button>${actionSecondary(b)?`<div class="s-sec">${actionSecondary(b)}</div>`:''}</div>`:'';
+  return `${slipHeader()}<div class="s-title"><b>TAX INVOICE</b><span>${esc(b.payment.toUpperCase())}</span></div>
+    <div class="s-kv"><span>No.</span><b>${esc(b.no)}</b></div>
+    <div class="s-kv"><span>Date</span><b>${d.toLocaleDateString('en-IN')} ${timeStr(b.at)}</b></div>
+    <div class="s-kv"><span>Patient</span><b>${esc(b.patient.name||'Walk-in')}${b.patient.age!=null?`, ${b.patient.age}`:''}</b></div>
+    <hr class="s-rule"><div class="s-items">${b.lines.map(l=>`<div class="s-item"><div class="s-name">${esc(l.name)}${l.rx?' ℞':''}</div><div class="s-amt">${l.amount.toFixed(2)}</div><div class="s-meta">${esc(l.qtyLabel)} × ${l.rate.toFixed(2)} · ${esc(l.batch)} · ${expLabel(l.expiry)}</div></div>`).join('')}</div>
+    <hr class="s-rule"><div class="s-total"><span class="s-stamp">PAID</span><span>TOTAL</span><b>${money(b.total)}</b></div>
+    <p class="s-note">MRP incl. GST · GSTIN ${esc(STORE.gstin)}${rx?' · ℞ dispensed on prescription':''}</p>${actions}`;
+}
+
+/* ---------- command handling ---------- */
+let samplePromise=null;
+const getSample=()=>{ if(!window.claude||!window.claude.use) return Promise.resolve(null); if(!samplePromise) samplePromise=window.claude.use('sample').catch(()=>null); return samplePromise; };
+async function claudeParse(text){
+  const s=await getSample(); if(!s) return null;
+  const list=Object.values(Data.inv).map(m=>`${m.id} | ${m.name} | ${m.generic} | sold per ${m.packName}${m.pack>1?` of ${m.pack} ${m.unitName}s`:''}`).join('\n');
+  const prompt=`You read voice commands spoken at an Indian pharmacy counter (Hindi, English, Marathi, Kannada, Telugu or a mix). Match medicines ONLY to this stock list (id | name | salt | pack):\n${list}\n\nCommand: """${text}"""\n\nReply with JSON only: {"intent":"bill"|"stock"|"restock"|"unknown","patient":{"name":string,"age":number|null},"items":[{"id":string,"qty":number,"unit":"pack"|"unit"}]}. "pack" means strips/bottles/tubes, "unit" means single tablets/capsules. Write the patient's name in Latin letters. If no medicine from the list is mentioned, use intent "unknown" and an empty items list.`;
+  try{
+    const r=await s.json(prompt,{modelTier:'quick'});
+    if(!r||!Array.isArray(r.items)) return null;
+    const items=r.items.filter(i=>i&&Data.inv[i.id]).map(i=>({id:i.id,qty:Math.max(1,parseInt(i.qty,10)||1),unit:i.unit==='unit'?'unit':'pack',assumedQty:!i.qty}));
+    if(!items.length) return null;
+    return {intent:['bill','stock','restock'].includes(r.intent)?r.intent:'bill',items,patient:{name:(r.patient&&r.patient.name)||'',age:r.patient&&Number.isFinite(+r.patient.age)&&r.patient.age!==null?+r.patient.age:null},text};
+  }catch(e){ return null; }
+}
+async function handleCommand(text,meta){
+  text=(text||'').trim(); if(!text) return;
+  if(view!=='counter') location.hash='counter';
+  if(!meta.keepLive) showLive('Heard',text,meta.engine);
+  const pending=slip.mode==='draft'||slip.mode==='restock';
+  let res=parseCommand(text,Data.inv,INDEX,{pending});
+  let via=meta.engine||'Typed';
+  if(!meta.agent) setMicState(IN_ARTIFACT?'Type or tap a demo':'Tap to speak');
+  if(meta.agent&&res.intent==='unknown'){ logEvent(text,meta,'chat','Agent conversation'); return; }
+  if(res.intent==='unknown'){
+    const s=await getSample();
+    if(s){ slip={mode:'thinking',transcript:text}; renderSlip();
+      const c=await claudeParse(text); if(c){ res=c; via+=' · matched by Claude'; } }
+  }
+  const short=(res.items||[]).map(it=>`${Data.inv[it.id].name} × ${unitLabel(Data.inv[it.id],it.unit,it.qty)}`).join(', ');
+  switch(res.intent){
+    case 'confirm': if(pending){ logEvent(text,meta,'confirm','Confirmed by voice'); confirmSlip(); } return;
+    case 'cancel': if(pending){ slip={mode:'idle'}; renderSlip(); logEvent(text,meta,'cancel','Draft cancelled'); speak('Cancelled.'); } return;
+    case 'bill': {
+      slip={mode:'draft',patient:res.patient,items:res.items,transcript:text,via,t0:meta.t0||performance.now(),payment:'Cash',engine:meta.engine||'Typed'};
+      renderSlip();
+      const issues=res.items.map(it=>({m:Data.inv[it.id],i:itemIssue(it)})).filter(x=>x.i);
+      let say=`${res.patient.name||'Patient'}. ${res.items.map(it=>`${Data.inv[it.id].name}, ${unitLabel(Data.inv[it.id],it.unit,it.qty)}`).join('. ')}.`;
+      if(issues.length) issues.forEach(x=>{ say+= x.i.k==='expired'?` ${x.m.name} is expired.${x.i.subs&&x.i.subs.length?` ${x.i.subs[0].name} has the same salt.`:''}`: x.i.k==='out'?` ${x.m.name} is out of stock.${x.i.subs&&x.i.subs.length?` ${x.i.subs[0].name} has the same salt.`:''}`:` Only ${stockText(x.m)} of ${x.m.name} left.`; });
+      else say+=` Total ${Math.round(res.items.reduce((a,it)=>a+lineAmt(Data.inv[it.id],it),0))} rupees. Confirm?`;
+      speak(say); logEvent(text,meta,'bill',`Draft: ${short}${issues.length?' (stock issue)':''}`); return; }
+    case 'stock':
+      slip={mode:'stock',items:res.items,transcript:text,via}; renderSlip();
+      speak(res.items.map(it=>{const m=Data.inv[it.id]; return m.stock>0?`${m.name}: ${stockText(m)}, rack ${m.rack}.`:`${m.name} is out of stock.`}).join(' '));
+      logEvent(text,meta,'stock',res.items.map(it=>`${Data.inv[it.id].name}: ${stockText(Data.inv[it.id])}`).join('; ')); return;
+    case 'restock':
+      slip={mode:'restock',items:res.items,transcript:text,via}; renderSlip();
+      speak(`Add ${res.items.map(it=>`${unitLabel(Data.inv[it.id],it.unit,it.qty)} of ${Data.inv[it.id].name}`).join(', ')} to stock?`);
+      logEvent(text,meta,'restock',`Draft: ${short}`); return;
+    default:
+      slip={mode:'unknown',transcript:text,via}; renderSlip(); speak('I could not find the medicine. Please say it again.');
+      logEvent(text,meta,'unknown','No medicine recognised');
+  }
+}
+function confirmSlip(){
+  if(Data.readOnly){ toast('View-only access.','bad'); return; }
+  if(slip.mode==='restock'){
+    const ids=slip.items.map(it=>{ const m=Data.inv[it.id]; m.stock+=needUnits(m,it); flash.add(m.id); return m.id; });
+    persistStock(ids); toast('Stock updated','ok'); speak('Stock updated.'); slip={mode:'idle'}; renderAll(); return;
+  }
+  if(slip.mode!=='draft') return;
+  const n=$('#pName'); if(n) slip.patient.name=n.value.trim();
+  const a=$('#pAge'); if(a) slip.patient.age=a.value?Number(a.value):null;
+  if(!slip.items.length||slip.items.some(it=>itemIssue(it)||!(it.qty>0))){ toast('Fix the marked item first.','bad'); return; }
+  const lines=slip.items.map(it=>{ const m=Data.inv[it.id]; m.stock-=needUnits(m,it); flash.add(m.id);
+    return {id:m.id,name:m.name,generic:m.generic,batch:m.batch,expiry:m.expiry,rx:m.rx,units:needUnits(m,it),qtyLabel:unitLabel(m,it.unit,it.qty),rate:it.unit==='pack'||m.pack===1?m.mrp:m.mrp/m.pack,amount:lineAmt(m,it)}; });
+  persistStock(lines.map(l=>l.id));
+  const seconds=+Math.max(1,(performance.now()-slip.t0)/1000).toFixed(1);
+  const b={id:'b'+Date.now().toString(36),no:billNo(),at:Date.now(),patient:{name:slip.patient.name||'',age:slip.patient.age??null},payment:slip.payment,lines,total:+lines.reduce((s,l)=>s+l.amount,0).toFixed(2),seconds,engine:slip.engine,transcript:slip.transcript};
+  persistBill(b); lastBill=b;
+  slip={mode:'done',bill:b}; renderAll();
+  speak(`Bill done. ${Math.round(b.total)} rupees.`);
+  if(SET.autoPrint&&!IN_ARTIFACT) setTimeout(()=>printBill(b),350);
+}
+function printBill(b){ $('#printArea').innerHTML=`<div class="slip">${receiptHTML(b,false)}</div>`; try{ window.print(); }catch(e){} }
+let Downloads=null;
+async function saveBill(b){
+  if(!Downloads) return;
+  const html=`<!doctype html><meta charset="utf-8"><title>${esc(b.no)}</title><style>body{font:13px/1.5 ui-monospace,Menlo,monospace;max-width:320px;margin:20px auto}.s-stamp{display:none}.s-store{text-align:center;display:flex;flex-direction:column}.s-title{text-align:center;letter-spacing:.2em;margin:8px 0}.s-kv,.s-total{display:flex;justify-content:space-between}.s-item{display:grid;grid-template-columns:1fr auto;padding:4px 0;border-bottom:1px dotted #aaa}.s-meta{grid-column:1/-1;font-size:11px;color:#555}.s-note{font-size:11px;color:#444}.s-thanks{text-align:center}hr{border:0;border-top:1px dashed #999}</style>${receiptHTML(b,false)}`;
+  try{ await Downloads.save({filename:`${b.no.replace(/\//g,'-')}.html`,data:html}); }catch(e){ if(e&&e.code!=='cancelled') toast('Could not save the bill.','bad'); }
+}
+
+/* ---------- live transcript ---------- */
+function showLive(_tag,text,src){ $('#live').innerHTML=`${esc(text)}${src?`<br><span class="src">${esc(src)}</span>`:''}`; }
+function setMicState(t){ $('#micState').textContent=t; }
+
+/* ---------- stock page ---------- */
+let invFilter='all', invQuery='', expWin='all', invSort='expiry'; const flash=new Set();
+const EXP_WINDOWS=[['all','All'],[30,'30 days'],[60,'60 days'],[90,'3 months'],[180,'6 months'],[365,'1 year'],['expired','Expired']];
+function stockStats(){ const meds=Object.values(Data.inv); return {total:meds.length,out:meds.filter(m=>m.stock<=0).length,low:meds.filter(m=>m.stock>0&&m.stock<=m.reorder).length,exp30:meds.filter(m=>m.stock>0&&daysLeft(m.expiry)<=30).length}; }
+function inWindow(m){ const d=daysLeft(m.expiry); if(expWin==='all') return true; if(expWin==='expired') return d<0; return d>=0&&d<=expWin; }
+function renderStock(){
+  const st=stockStats();
+  $('#stockStats').innerHTML=[['all',st.total,'Medicines',''],['out',st.out,'Out of stock','bad'],['low',st.low,'Reorder','warn'],['exp30',st.exp30,'Expired or ≤ 30 days','bad']]
+    .map(([f,n,l,c])=>`<button type="button" class="stat ${c}" data-f="${f}" aria-pressed="${invFilter===f}"><b>${n}</b><span>${l}</span></button>`).join('');
+  $('#expWin').innerHTML=EXP_WINDOWS.map(([v,l])=>`<button type="button" data-w="${v}" class="${v==='expired'?'red':''}" aria-pressed="${String(expWin)===String(v)}">${l}</button>`).join('');
+  $('#invSort').value=invSort;
+  let meds=Object.values(Data.inv);
+  if(invFilter==='out') meds=meds.filter(m=>m.stock<=0);
+  if(invFilter==='low') meds=meds.filter(m=>m.stock>0&&m.stock<=m.reorder);
+  if(invFilter==='exp30') meds=meds.filter(m=>m.stock>0&&daysLeft(m.expiry)<=30);
+  meds=meds.filter(inWindow);
+  if(invQuery){ const q=invQuery.toLowerCase(); meds=meds.filter(m=>(m.name+' '+m.generic+' '+m.rack).toLowerCase().includes(q)); }
+  const sorters={expiry:(a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry)||b.stock-a.stock,value:(a,b)=>stockValue(b)-stockValue(a),rack:(a,b)=>a.rack.localeCompare(b.rack)||a.name.localeCompare(b.name),name:(a,b)=>a.name.localeCompare(b.name)};
+  meds.sort(sorters[invSort]);
+  const inStock=meds.filter(m=>m.stock>0);
+  $('#expSum').innerHTML=expWin==='all'?'':`<b>${inStock.length}</b> in stock · <b>${money(inStock.reduce((a,m)=>a+stockValue(m),0)).replace(/\.\d\d$/,'')}</b> at MRP`;
+  $('#stockBody').innerHTML=`<div class="tablewrap"><table class="t"><thead><tr><th>Medicine</th><th>Expiry</th><th>Stock</th><th class="hide-s num">Value</th><th class="hide-s">Rack</th></tr></thead><tbody>
+    ${meds.map(m=>{ const [k,l]=status(m); const pct=Math.min(100,Math.round(m.stock/Math.max(m.reorder*3,1)*100)); const e=expInfo(m.expiry);
+      return `<tr class="${flash.has(m.id)?'flash':''} ${e.d<0&&m.stock>0?'expired':''}"><td><b>${esc(m.name)}</b> ${m.rx?'<span class="tag rx">Rx</span>':''}<small>${esc(m.generic)} · ${m.batch}</small></td>
+      <td class="mono">${expLabel(m.expiry)}<span class="days ${e.cls}">${e.txt}</span></td>
+      <td><div class="lvl"><span class="gauge"><i class="${k}" style="width:${Math.max(pct,k==='out'?0:4)}%"></i></span><span class="mono">${esc(stockText(m))}</span></div>${k!=='ok'?`<small><span class="tag ${k}">${l}</span></small>`:''}</td>
+      <td class="hide-s num mono">${money(stockValue(m)).replace(/\.\d\d$/,'')}</td><td class="hide-s mono">${m.rack}</td></tr>`; }).join('')||'<tr><td colspan="5" class="empty">Nothing in this window.</td></tr>'}
+    </tbody></table></div>`;
+  setTimeout(()=>flash.clear(),1900);
+}
+
+/* ---------- bills page ---------- */
+let selBill=null;
+function renderBills(){
+  const bills=Data.bills; const t=bills.filter(b=>new Date(b.at).toDateString()===today());
+  $('#billsSub').textContent=bills.length?`${t.length} today · ${money(t.reduce((a,b)=>a+b.total,0)).replace('.00','')}`:'';
+  if(!bills.length){ $('#billsBody').innerHTML=`<p class="empty">No bills yet.</p>`; $('#billSlip').innerHTML=`${slipHeader()}<div class="s-empty">${ICON.slip}<span>Select a bill</span></div>`; return; }
+  if(!selBill||!bills.find(b=>b.id===selBill)) selBill=bills[0].id;
+  $('#billsBody').innerHTML=`<div class="tablewrap"><table class="t"><thead><tr><th>Time</th><th>Patient</th><th class="num">Total</th><th class="num">Speed</th></tr></thead><tbody>
+    ${bills.map(b=>`<tr class="click ${b.id===selBill?'sel':''}" data-bill="${esc(b.id)}" tabindex="0"><td class="mono">${timeStr(b.at)}<small>${new Date(b.at).toLocaleDateString('en-IN',{day:'numeric',month:'short'})}</small></td><td><b>${esc(b.patient.name||'Walk-in')}</b>${b.sample?' <span class="tag">Sample</span>':''}<small>${b.lines.map(l=>esc(l.name)).join(', ')}</small></td><td class="num mono">${money(b.total)}</td><td class="num mono">${b.seconds} s</td></tr>`).join('')}
+    </tbody></table></div>`;
+  const b=bills.find(x=>x.id===selBill); const sec=actionSecondary(b);
+  $('#billSlip').innerHTML=receiptHTML(b,false)+(sec?`<div class="s-actions"><div class="s-sec">${sec}</div></div>`:'');
+}
+
+/* ---------- dashboard ---------- */
+let period='7';
+const PERIODS=[['1','Today'],['7','7 days'],['30','30 days']];
+function periodBills(){ const start=new Date(); start.setHours(0,0,0,0); const from=start.getTime()-(Number(period)-1)*864e5; return Data.bills.filter(b=>b.at>=from); }
+const lineUnits=(l)=>{ if(l.units!=null) return l.units; const m=Data.inv[l.id]; const n=parseInt(l.qtyLabel,10)||0; return m&&/strip|bottle|tube|sachet|box/.test(l.qtyLabel)?n*m.pack:n; };
+function renderInsights(){
+  $('#period').innerHTML=PERIODS.map(([v,l])=>`<button type="button" data-p="${v}" aria-pressed="${period===v}">${l}</button>`).join('');
+  const bills=periodBills(), today=Data.bills.filter(b=>new Date(b.at).toDateString()===new Date().toDateString());
+  const sales=bills.reduce((a,b)=>a+b.total,0);
+  const avg=bills.length?bills.reduce((a,b)=>a+b.seconds,0)/bills.length:0;
+  const saved=bills.reduce((a,b)=>a+Math.max(0,MANUAL_SECONDS-b.seconds),0)/60;
+  const pl=PERIODS.find(p=>p[0]===period)[1].toLowerCase();
+  $('#kpis').innerHTML=[
+    [`Sales · ${pl}`,money(sales).replace(/\.\d\d$/,''),'hero'],
+    ['Bills',bills.length,''],
+    ['Avg per bill',bills.length?avg.toFixed(1)+' s':'—',''],
+    ['Time saved',bills.length?(saved>=60?(saved/60).toFixed(1)+' h':Math.round(saved)+' min'):'—',''],
+  ].map(([l,v,c])=>`<div class="kpi ${c}"><span>${l}</span><b>${v}</b></div>`).join('');
+  // top sellers by revenue
+  const agg={}; bills.forEach(b=>b.lines.forEach(l=>{ const a=agg[l.id]||(agg[l.id]={id:l.id,name:l.name,rev:0,units:0,bills:0}); a.rev+=l.amount; a.units+=lineUnits(l); a.bills++; }));
+  const top=Object.values(agg).sort((a,b)=>b.rev-a.rev).slice(0,8); const maxRev=top.length?top[0].rev:1;
+  $('#topSub').textContent=bills.some(b=>b.sample)?'includes sample sales':'';
+  $('#topBody').innerHTML=top.length?`<div class="tablewrap"><table class="t"><thead><tr><th></th><th>Medicine</th><th class="num">Sold</th><th class="num">Revenue</th><th>Stock left</th></tr></thead><tbody>
+    ${top.map((t,i)=>{ const m=Data.inv[t.id]; const [k,l]=m?status(m):['ok','']; const sold=m?plural(m.pack>1?Math.round(t.units/m.pack*10)/10:t.units,m.packName):t.units;
+      return `<tr class="${i<3?'top':''}"><td><span class="rank">${i+1}</span></td><td><b>${esc(t.name)}</b><div class="share"><i style="width:${Math.round(t.rev/maxRev*100)}%"></i></div></td><td class="num mono">${esc(sold)}</td><td class="num mono">${money(t.rev).replace(/\.\d\d$/,'')}</td><td>${m?`<span class="mono">${esc(stockText(m))}</span>${k!=='ok'?` <span class="tag ${k}">${l}</span>`:''}`:''}</td></tr>`; }).join('')}
+    </tbody></table></div>`:'<p class="empty">No sales in this period.</p>';
+  // sell first: in-stock, expiring within 90 days or expired, soonest first
+  const risk=Object.values(Data.inv).filter(m=>m.stock>0&&daysLeft(m.expiry)<=90).sort((a,b)=>daysLeft(a.expiry)-daysLeft(b.expiry));
+  $('#riskSub').textContent=risk.length?`${money(risk.reduce((a,m)=>a+stockValue(m),0)).replace(/\.\d\d$/,'')} at MRP`:'';
+  $('#riskBody').innerHTML=risk.length?`<div class="tablewrap"><table class="t"><thead><tr><th>Medicine</th><th>Expiry</th><th>Stock</th><th class="num">Value</th></tr></thead><tbody>
+    ${risk.map(m=>{ const e=expInfo(m.expiry); return `<tr class="${e.d<0?'expired':''}"><td><b>${esc(m.name)}</b><small>${m.rack} · ${m.batch}</small></td><td class="mono">${expLabel(m.expiry)}<span class="days ${e.cls}">${e.d<0?'Expired · remove':e.txt}</span></td><td class="mono">${esc(stockText(m))}</td><td class="num mono">${money(stockValue(m)).replace(/\.\d\d$/,'')}</td></tr>`; }).join('')}
+    </tbody></table></div>`:'<p class="empty">Nothing expires in the next 3 months.</p>';
+  // seconds per bill, today
+  const rows=[{label:'Manual (typical)',v:MANUAL_SECONDS,ref:true}].concat(today.filter(b=>!b.sample).slice(0,8).reverse().map(b=>({label:`${timeStr(b.at)} ${b.patient.name||'Walk-in'}`,v:b.seconds})));
+  if(rows.length===1) $('#timeChart').innerHTML='<p class="empty">Make a bill on the Counter to see its time here.</p>';
+  else{
+    const W=560,L=150,R=58,rowH=30,H=rows.length*rowH+26,max=Math.max(MANUAL_SECONDS,...rows.map(r=>r.v)),x=v=>L+(W-L-R)*v/max;
+    const ticks=[0,60,120,180,240,300].filter(v=>v<=max);
+    $('#timeChart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Seconds per bill compared with manual billing">
+      ${ticks.map(v=>`<line x1="${x(v)}" x2="${x(v)}" y1="4" y2="${H-22}" stroke="var(--line)" stroke-width="1"/><text x="${x(v)}" y="${H-6}" font-size="11" text-anchor="middle" fill="var(--muted)" font-family="var(--mono)">${v===0?'0':v/60+'m'}</text>`).join('')}
+      ${rows.map((r,i)=>{ const y=8+i*rowH, w=Math.max(3,x(r.v)-L); return `<text x="${L-10}" y="${y+15}" font-size="12" text-anchor="end" fill="${r.ref?'var(--muted)':'var(--ink)'}" font-family="var(--body)">${esc(r.label.length>20?r.label.slice(0,19)+'…':r.label)}</text>
+        <rect x="${L}" y="${y+3}" width="${w}" height="18" rx="4" fill="${r.ref?'var(--line)':'var(--brand)'}"/>
+        <text x="${L+w+6}" y="${y+16}" font-size="12" fill="var(--ink)" font-family="var(--mono)" font-weight="600">${r.ref?'~300 s':r.v+' s'}</text>`; }).join('')}
+    </svg>`;
+  }
+  $('#logBody').innerHTML=Data.log.length?`<ul class="log">${Data.log.map(l=>`<li><span class="t">${timeStr(l.at)}</span><span class="txt">${esc(l.text)}</span><span class="out">${esc(l.outcome)} · ${esc(l.engine)}</span></li>`).join('')}</ul>`:'<p class="empty">Nothing yet.</p>';
+}
+
+/* ---------- chrome: engine pill, nav dot, footer ---------- */
+let SERVER_READY=false;
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+const sarvamAvailable=()=>SET.useVoice&&(SET.key||SERVER_READY);
+function renderEngine(){
+  const p=$('#engine'); let cls='',txt='';
+  if(IN_ARTIFACT){ cls='warn'; txt='Typing mode'; }
+  else if(sarvamAvailable()){ if(SET.key&&SET.keyState==='bad'){cls='bad';txt='Sarvam key issue';} else {cls='ok';txt='Sarvam';} }
+  else if(SR){ cls='warn'; txt='Browser speech'; }
+  else { cls='bad'; txt='Typing only'; }
+  p.className='pill '+cls; $('#engineTxt').textContent=txt;
+  document.querySelectorAll('#langs button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.lang===SET.lang));
+  if(IN_ARTIFACT&&!rec) setMicState('Type or tap a demo');
+}
+function renderFoot(msg){
+  const d=$('#dataMode'); d.textContent=msg||(Data.cloud?'Cloud database':'Saved on this device'); d.className='dot'+(Data.cloud?' cloud':'');
+  const st=stockStats(); $('#navAlert').hidden=!(st.out||st.low);
+}
+function renderAll(){ renderSlip(); renderFoot(); if(view==='stock') renderStock(); if(view==='bills') renderBills(); if(view==='insights') renderInsights(); }
+
+/* ---------- microphone + speech (Sarvam, browser fallback) ---------- */
+let rec=null;
+const WAVE_N=28;
+function drawWave(level,t){ const bars=$('#wave').children; for(let i=0;i<bars.length;i++){ const h=4+level*30*(0.35+0.65*Math.abs(Math.sin(i*1.7+t*0.012))); bars[i].style.height=h.toFixed(1)+'px'; } }
+function encodeWav(chunks,inRate){
+  const len=chunks.reduce((a,c)=>a+c.length,0); const data=new Float32Array(len); let o=0; chunks.forEach(c=>{data.set(c,o);o+=c.length;});
+  const ratio=inRate/16000; const outLen=Math.min(Math.floor(len/ratio),16000*29);
+  const buf=new ArrayBuffer(44+outLen*2); const v=new DataView(buf); const ws=(off,s)=>{for(let i=0;i<s.length;i++) v.setUint8(off+i,s.charCodeAt(i));};
+  ws(0,'RIFF'); v.setUint32(4,36+outLen*2,true); ws(8,'WAVE'); ws(12,'fmt '); v.setUint32(16,16,true); v.setUint16(20,1,true); v.setUint16(22,1,true); v.setUint32(24,16000,true); v.setUint32(28,32000,true); v.setUint16(32,2,true); v.setUint16(34,16,true); ws(36,'data'); v.setUint32(40,outLen*2,true);
+  for(let i=0;i<outLen;i++){ const s0=Math.floor(i*ratio), s1=Math.min(len,Math.floor((i+1)*ratio)); let sum=0,c=0; for(let k=s0;k<s1;k++){sum+=data[k];c++;} let s=c?sum/c:0; s=Math.max(-1,Math.min(1,s)); v.setInt16(44+i*2,s<0?s*0x8000:s*0x7FFF,true); }
+  return {blob:new Blob([buf],{type:'audio/wav'}),seconds:outLen/16000};
+}
+const silentWav=()=>encodeWav([new Float32Array(16000)],16000).blob;
+function sarvamError(status,body){
+  const code=(body&&body.error&&body.error.code)||'';
+  if(status===403||code==='invalid_api_key_error'||code==='authentication_error') return 'Sarvam rejected the key. Check Settings.';
+  if(code==='insufficient_quota_error') return 'Sarvam credits are used up.';
+  if(status===429) return 'Sarvam is busy. Try again.';
+  if(status===503&&code==='NOT_CONFIGURED') return 'No Sarvam key on the server yet.';
+  return `Sarvam error ${status}${code?' ('+code+')':''}.`;
+}
+async function sarvamSTT(blob,minimal){
+  const fd=new FormData();
+  fd.append('file',blob,'command.wav'); fd.append('model',SARVAM_MODEL); fd.append('language_code',LANGS[SET.lang].code);
+  if(!minimal) fd.append('keyterms',JSON.stringify(KEYTERMS.slice(0,50)));
+  const direct=!!SET.key;
+  const ctl=new AbortController(); const to=setTimeout(()=>ctl.abort(),15000);
+  let r; try{ r=await fetch(direct?SARVAM_URL:'api/stt',{method:'POST',headers:direct?{'api-subscription-key':SET.key}:{},body:fd,signal:ctl.signal}); }
+  catch(e){ clearTimeout(to); throw new Error(e.name==='AbortError'?'Sarvam took too long.':'Could not reach Sarvam. Check the internet.'); }
+  clearTimeout(to);
+  let body={}; try{ body=await r.json(); }catch(e){}
+  if((r.status===400||r.status===422)&&!minimal) return sarvamSTT(blob,true);
+  if(!r.ok){ const err=new Error(sarvamError(r.status,body)); err.status=r.status; err.code=body&&body.error&&body.error.code; throw err; }
+  return {text:(body.transcript||'').trim(),lang:body.language_code||''};
+}
+async function startListening(){
+  if(AG) return stopAgent();
+  if(rec) return stopListening();
+  if(IN_ARTIFACT){ showLive('','Voice works in the Chrome app. Type below or tap a demo.'); $('#cmd').focus(); return; }
+  if(!navigator.mediaDevices||!navigator.mediaDevices.getUserMedia){ toast('Microphone not available. Use Chrome.','bad'); return; }
+  const r={t0:performance.now(),chunks:[],browserText:'',interim:''}; rec=r;
+  try{ r.stream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:true,noiseSuppression:true,channelCount:1}}); }
+  catch(e){ rec=null; toast('Allow the microphone in the address bar.','bad'); return; }
+  r.ctx=new (window.AudioContext||window.webkitAudioContext)();
+  const src=r.ctx.createMediaStreamSource(r.stream);
+  r.an=r.ctx.createAnalyser(); r.an.fftSize=512; src.connect(r.an);
+  r.proc=r.ctx.createScriptProcessor(4096,1,1);
+  r.proc.onaudioprocess=e=>{ if(rec===r) r.chunks.push(new Float32Array(e.inputBuffer.getChannelData(0))); };
+  src.connect(r.proc); r.proc.connect(r.ctx.destination);
+  if(SR){ try{ const s=new SR(); s.lang=LANGS[SET.lang].sr; s.continuous=true; s.interimResults=true;
+    s.onresult=ev=>{ let fin='',inter=''; for(let i=0;i<ev.results.length;i++){ const t=ev.results[i][0].transcript; if(ev.results[i].isFinal) fin+=t+' '; else inter+=t; } r.browserText=fin.trim(); r.interim=inter; showLive('',(fin+inter).trim()); };
+    r.srDone=new Promise(res=>{ s.onend=res; s.onerror=res; }); s.start(); r.sr=s; }catch(e){} }
+  document.body.classList.add('listening'); setMicState('Listening'); $('#live').innerHTML='';
+  const lvl=new Uint8Array(r.an.fftSize);
+  const tick=t=>{ if(rec!==r){ drawWave(0,0); return; } r.an.getByteTimeDomainData(lvl); let m=0; for(const x of lvl) m=Math.max(m,Math.abs(x-128)); const L=Math.min(1,m/90); document.documentElement.style.setProperty('--lvl',L.toFixed(3)); drawWave(L,t||0); requestAnimationFrame(tick); };
+  tick(); r.timer=setTimeout(()=>{ if(rec===r) stopListening(); },25000);
+}
+async function stopListening(){
+  const r=rec; if(!r) return; rec=null; clearTimeout(r.timer);
+  document.body.classList.remove('listening'); document.documentElement.style.setProperty('--lvl',0); drawWave(0,0);
+  setMicState('Transcribing'); document.body.classList.add('busy');
+  try{ r.proc.disconnect(); }catch(e){} r.stream.getTracks().forEach(t=>t.stop());
+  const rate=r.ctx.sampleRate; try{ r.ctx.close(); }catch(e){}
+  if(r.sr){ try{ r.sr.stop(); }catch(e){} await Promise.race([r.srDone,new Promise(x=>setTimeout(x,1500))]); }
+  const wav=encodeWav(r.chunks,rate);
+  let text='',engine='',lang='',err='';
+  if(sarvamAvailable()&&wav.seconds>0.4){
+    try{ const g=await sarvamSTT(wav.blob); text=g.text; lang=g.lang; engine='Sarvam'; if(SET.key&&SET.keyState!=='ok'){SET.keyState='ok';saveSet();renderEngine();} }
+    catch(e){ err=e.message; if(SET.key&&e.status===403){ SET.keyState='bad'; saveSet(); renderEngine(); } }
+  }
+  const browser=(r.browserText+' '+(r.interim||'')).trim();
+  if(!text&&browser){ text=browser; engine='Browser speech'; lang=LANGS[SET.lang].sr; }
+  document.body.classList.remove('busy'); setMicState('Tap to speak');
+  if(err) toast(err+(text?' Used browser speech.':''),'bad');
+  if(!text){ showLive('','Didn’t catch that. Try again.'); return; }
+  handleCommand(text,{engine,lang,t0:r.t0,latency:(performance.now()-r.t0)/1000});
+}
+
+/* ---------- Samvaad voice agent (Sarvam conversational AI) ---------- */
+let AG=null, agentEnding=false;
+const agentReady=()=>{ const a=SET.agent||{}; return !!(a.key&&a.app&&a.org&&a.ws); };
+function agentError(e){
+  const n=(e&&(e.name||e.constructor&&e.constructor.name))||'', m=(e&&e.message)||'';
+  if(/Authentication|401/.test(n+m)) return 'Agent key rejected. Check the key in Settings.';
+  if(/Forbidden|403/.test(n+m)) return 'This key cannot open that agent. Check the org and workspace IDs.';
+  if(/NotFound|404/.test(n+m)||/no committed version/i.test(m)) return 'Agent not found. Check the agent ID, or commit a version in Samvaad.';
+  if(/RateLimit|429/.test(n+m)) return 'Sarvam is busy. Try again in a moment.';
+  return 'Could not start the agent'+(m?': '+m.slice(0,90):'.');
+}
+function renderAgentBtn(){
+  const b=$('#agentBtn'); if(!b) return;
+  b.hidden=IN_ARTIFACT||!window.SarvamConv;
+  $('#agentTxt').textContent=AG?'End agent call':'Talk to agent';
+}
+async function stopAgent(){
+  const ag=AG; if(!ag) return; agentEnding=true; AG=null;
+  try{ await ag.stop(); }catch(e){}
+  document.body.classList.remove('agent'); setMicState(IN_ARTIFACT?'Type or tap a demo':'Tap to speak'); renderAgentBtn(); agentEnding=false;
+}
+async function toggleAgent(){
+  if(AG) return stopAgent();
+  if(!agentReady()){ openSettings(); $('#agentSet').open=true; toast('Add the agent key and IDs first'); return; }
+  if(rec) await stopListening();
+  const {ConversationAgent,BrowserAudioInterface,InteractionType}=window.SarvamConv;
+  const a=SET.agent;
+  let ag;
+  try{
+    ag=new ConversationAgent({
+      apiKey:a.key,
+      config:{org_id:a.org,workspace_id:a.ws,app_id:a.app,user_identifier:'counter-'+Math.random().toString(36).slice(2,8),user_identifier_type:'custom',interaction_type:InteractionType.CALL,input_sample_rate:16000,output_sample_rate:16000},
+      audioInterface:new BrowserAudioInterface(),
+      transcriptCallback:async msg=>{
+        if(!msg||!msg.content) return;
+        const user=msg.role==='user';
+        $('#live').innerHTML=`<span class="who">${user?'You':'Agent'}</span>${esc(msg.content)}`;
+        if(user) handleCommand(msg.content,{engine:'Samvaad agent',t0:performance.now(),agent:true,keepLive:true});
+      },
+      stateCallback:async st=>{ if(!AG) return; const L={connecting:'Connecting…',connected:'Agent connected',listening:'Agent listening',speaking:'Agent speaking',error:'Agent error'}; setMicState(L[st]||'Agent'); },
+      endCallback:async()=>{ if(AG&&!agentEnding){ AG=null; document.body.classList.remove('agent'); setMicState('Tap to speak'); renderAgentBtn(); toast('Agent call ended'); } },
+    });
+  }catch(e){ toast(agentError(e),'bad'); return; }
+  AG=ag; document.body.classList.add('agent'); renderAgentBtn(); setMicState('Connecting…'); $('#live').innerHTML='';
+  try{
+    await ag.start();
+    const ok=await ag.waitForConnect(12);
+    if(!ok) throw new Error('timed out connecting');
+    logEvent('Agent call started',{engine:'Samvaad agent'},'agent','Connected');
+  }catch(e){ toast(agentError(e),'bad'); await stopAgent(); }
+}
+
+/* ---------- settings ---------- */
+function keyStatusText(){ return SET.key?(SET.keyState==='ok'?'Key works.':SET.keyState==='bad'?'Key rejected last time.':'Saved. Not tested yet.'):(SERVER_READY?'Using the server key.':'No key. Browser speech is used.'); }
+function openSettings(){
+  $('#setKey').value=SET.key; $('#setVoice').checked=SET.useVoice; $('#setSpeak').checked=SET.speak; $('#setPrint').checked=SET.autoPrint;
+  $('#keyStatus').textContent=keyStatusText();
+  const a=SET.agent||{}; $('#agKey').value=a.key||''; $('#agApp').value=a.app||''; $('#agOrg').value=a.org||''; $('#agWs').value=a.ws||''; $('#agStatus').textContent=agentReady()?'Ready. Use “Talk to agent” on the Counter.':'Find the IDs in Samvaad → your agent → Deploy with code.'; $('#agentSet').hidden=IN_ARTIFACT;
+  const vn=$('#voiceNote'); vn.hidden=!IN_ARTIFACT; vn.textContent='Shared links can’t use the mic. Open Pharma-com.html in Chrome for voice.';
+  $('#setModal').hidden=false; $('#setKey').focus();
+}
+function saveSettings(){ const k=$('#setKey').value.trim(); if(k!==SET.key) SET.keyState=''; SET.key=k; SET.useVoice=$('#setVoice').checked; SET.speak=$('#setSpeak').checked; SET.autoPrint=$('#setPrint').checked; SET.agent={key:$('#agKey').value.trim(),app:$('#agApp').value.trim(),org:$('#agOrg').value.trim(),ws:$('#agWs').value.trim()}; saveSet(); renderEngine(); renderAgentBtn(); }
+async function testKey(){
+  saveSettings(); const st=$('#keyStatus');
+  if(!SET.key&&!SERVER_READY){ st.textContent='Paste a key first.'; return; }
+  st.textContent='Testing…';
+  try{ await sarvamSTT(silentWav(),true); if(SET.key) SET.keyState='ok'; st.textContent='Connected to Sarvam.'; }
+  catch(e){ if(SET.key&&e.status===403) SET.keyState='bad'; st.textContent=e.message; }
+  saveSet(); renderEngine();
+}
+
+/* ---------- reset ---------- */
+async function resetData(){
+  const seed=seedInventory();
+  if(Data.cloud&&Data.db){
+    try{
+      await Promise.all(Object.values(seed).map(m=>Data.db.doc('inventory/'+m.id).set(m)));
+      await Promise.all(Data.bills.map(b=>Data.db.doc('bills/'+(b._id||b.id)).delete().catch(()=>{})));
+      await Promise.all(Data.log.map(l=>Data.db.doc('log/'+(l._id||l.id)).delete().catch(()=>{})));
+      await Promise.all(sampleBills(seed).map(b=>Data.db.doc('bills/'+b.id).set(b)));
+    }catch(e){ cloudErr(e); return; }
+  }
+  Data.inv=seed; Data.bills=sampleBills(seed); Data.log=[]; reindex(); saveLocal(); slip={mode:'idle'}; renderAll(); toast('Reset done','ok');
+}
+
+/* ---------- events ---------- */
+const billById=id=>Data.bills.find(b=>b.id===id)||lastBill;
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]'); if(!el) return; const act=el.dataset.act, ix=+el.dataset.ix;
+  if(act==='example') handleCommand(el.dataset.text,{engine:'Demo',t0:performance.now()});
+  else if(act==='confirm') confirmSlip();
+  else if(act==='cancel'){ slip={mode:'idle'}; renderSlip(); }
+  else if(act==='done'||act==='next'){ slip={mode:'idle'}; renderSlip(); $('#live').innerHTML=''; }
+  else if(act==='remove'){ slip.items.splice(ix,1); if(!slip.items.length) slip={mode:'idle'}; renderSlip(); }
+  else if(act==='inc'||act==='dec'){ const it=slip.items[ix]; it.qty=Math.max(1,(it.qty||0)+(act==='inc'?1:-1)); it.assumedQty=false; renderSlip(); }
+  else if(act==='swap'){ slip.items[ix].id=el.dataset.to; renderSlip(); }
+  else if(act==='useavail'){ const it=slip.items[ix]; const m=Data.inv[it.id]; if(it.unit==='pack'&&m.pack>1&&m.stock%m.pack){ it.unit='unit'; it.qty=m.stock; } else it.qty=it.unit==='pack'||m.pack===1?Math.floor(m.stock/m.pack):m.stock; renderSlip(); }
+  else if(act==='pay'){ slip.payment=el.dataset.p; renderSlip(); }
+  else if(act==='print') printBill(billById(el.dataset.id));
+  else if(act==='save') saveBill(billById(el.dataset.id));
+  else if(act==='billfromstock'){ const items=slip.items.filter(it=>Data.inv[it.id].stock>0).map(it=>({id:it.id,qty:1,unit:'pack',assumedQty:true})); slip={mode:'draft',patient:{name:'',age:null},items,transcript:slip.transcript,t0:performance.now(),payment:'Cash',engine:'Typed'}; renderSlip(); }
+});
+document.addEventListener('change',e=>{
+  const el=e.target; if(slip.mode!=='draft') return; const ix=+el.dataset.ix;
+  if(el.dataset.act==='qty'){ slip.items[ix].qty=Math.max(1,parseInt(el.value,10)||1); slip.items[ix].assumedQty=false; renderSlip(); }
+  else if(el.dataset.act==='unit'){ slip.items[ix].unit=el.value; renderSlip(); }
+  else if(el.id==='addMed'&&el.value){ slip.items.push({id:el.value,qty:1,unit:'pack'}); renderSlip(); }
+});
+document.addEventListener('input',e=>{ if(slip.mode!=='draft') return; if(e.target.id==='pName') slip.patient.name=e.target.value; if(e.target.id==='pAge') slip.patient.age=e.target.value?Number(e.target.value):null; });
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ if(!$('#setModal').hidden){ $('#setModal').hidden=true; return; } if(slip.mode==='draft'||slip.mode==='restock'){ slip={mode:'idle'}; renderSlip(); } return; }
+  if(view!=='counter'||!$('#setModal').hidden) return;
+  const inField=e.target.closest('input,select,textarea,button');
+  if(e.key==='Enter'&&(slip.mode==='draft'||slip.mode==='restock')&&(!inField||e.target.closest('.s-patient,.s-qty'))){ e.preventDefault(); confirmSlip(); return; }
+  if(inField) return;
+  if(e.code==='Space'){ e.preventDefault(); startListening(); }
+});
+$('#billsBody').addEventListener('click',e=>{ const tr=e.target.closest('[data-bill]'); if(tr){ selBill=tr.dataset.bill; renderBills(); } });
+$('#billsBody').addEventListener('keydown',e=>{ const tr=e.target.closest('[data-bill]'); if(tr&&e.key==='Enter'){ selBill=tr.dataset.bill; renderBills(); } });
+$('#mic').addEventListener('click',startListening);
+$('#agentBtn').addEventListener('click',toggleAgent);
+$('#typeForm').addEventListener('submit',e=>{ e.preventDefault(); const v=$('#cmd').value; $('#cmd').value=''; handleCommand(v,{engine:'Typed',t0:performance.now()}); });
+$('#langs').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; SET.lang=b.dataset.lang; saveSet(); renderEngine(); });
+$('#stockStats').addEventListener('click',e=>{ const b=e.target.closest('[data-f]'); if(!b) return; invFilter=(invFilter===b.dataset.f?'all':b.dataset.f); if(invFilter==='exp30') expWin='all'; renderStock(); });
+$('#invSearch').addEventListener('input',e=>{ invQuery=e.target.value; renderStock(); });
+$('#expWin').addEventListener('click',e=>{ const b=e.target.closest('[data-w]'); if(!b) return; expWin=b.dataset.w==='all'||b.dataset.w==='expired'?b.dataset.w:Number(b.dataset.w); if(invFilter==='exp30') invFilter='all'; renderStock(); });
+$('#invSort').addEventListener('change',e=>{ invSort=e.target.value; renderStock(); });
+$('#period').addEventListener('click',e=>{ const b=e.target.closest('[data-p]'); if(!b) return; period=b.dataset.p; renderInsights(); });
+$('#openSet').addEventListener('click',openSettings);
+$('#engine').addEventListener('click',openSettings);
+$('#setSave').addEventListener('click',()=>{ saveSettings(); $('#setModal').hidden=true; toast('Saved','ok'); });
+$('#setTest').addEventListener('click',testKey);
+$('#setShow').addEventListener('click',()=>{ const i=$('#setKey'); i.type=i.type==='password'?'text':'password'; $('#setShow').textContent=i.type==='password'?'Show':'Hide'; });
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{ b.closest('.modal').hidden=true; }));
+$('#resetData').addEventListener('click',e=>{ const b=e.currentTarget; if(b.dataset.armed){ delete b.dataset.armed; b.textContent='Reset demo'; resetData(); } else { b.dataset.armed='1'; b.textContent='Tap again to reset'; setTimeout(()=>{ if(b.dataset.armed){ delete b.dataset.armed; b.textContent='Reset demo'; } },4000); } });
+
+/* ---------- boot ---------- */
+$('#langs').innerHTML=Object.entries(LANGS).map(([k,v])=>`<button type="button" data-lang="${k}">${v.label}</button>`).join('');
+$('#examples').innerHTML=EXAMPLES.map(([l,t,alt])=>`<button type="button" class="chip-btn${alt?' alt':''}" data-act="example" data-text="${esc(t)}" title="${esc(t)}">${esc(l)}</button>`).join('');
+$('#wave').innerHTML='<i></i>'.repeat(WAVE_N);
+loadLocal(); renderEngine(); renderAgentBtn(); setView(location.hash.slice(1)); renderAll();
+if('speechSynthesis' in window){ try{ speechSynthesis.getVoices(); }catch(e){} }
+cloudInit();
+if(window.claude&&window.claude.use){ window.claude.use('downloads').then(d=>{ Downloads=d; renderAll(); }).catch(()=>{}); }
+if(!IN_ARTIFACT&&location.protocol.startsWith('http')){
+  fetch('api/stt').then(r=>r.ok?r.json():null).then(j=>{ SERVER_READY=!!(j&&j.ready); renderEngine(); }).catch(()=>{});
+}
+
+</script>
+</body></html>

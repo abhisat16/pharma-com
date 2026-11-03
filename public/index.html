@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pharma.com</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Mono:wght@400;600&family=Noto+Sans:wght@400;600;700&family=Noto+Sans+Devanagari:wght@400;600&family=Noto+Sans+Kannada:wght@400;600&family=Noto+Sans+Telugu:wght@400;600&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<!--APP-START-->
+<header class="bar">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><rect width="40" height="40" rx="11" fill="var(--brand)"/><path d="M16 9h8v7h7v8h-7v7h-8v-7H9v-8h7z" fill="var(--brand-ink)"/><circle cx="31" cy="31" r="6" fill="var(--signal)" stroke="var(--brand)" stroke-width="2"/></svg>
+    <div class="brand-t"><b>Pharma.com</b><span>Shree Sai Medicals</span></div>
+  </div>
+  <nav class="nav" aria-label="Sections">
+    <a href="#counter" data-view="counter"><svg viewBox="0 0 24 24"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span>Counter</span></a>
+    <a href="#stock" data-view="stock"><svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4-9 4-9-4zM3 7v10l9 4 9-4V7M12 11v10"/></svg><span>Stock</span><i id="navAlert" hidden></i></a>
+    <a href="#bills" data-view="bills"><svg viewBox="0 0 24 24"><path d="M6 3h12v18l-3-2-3 2-3-2-3 2V3zM9 8h6M9 12h6"/></svg><span>Bills</span></a>
+    <a href="#insights" data-view="insights"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg><span>Dashboard</span></a>
+  </nav>
+  <div class="bar-r">
+    <button type="button" id="engine" class="pill" title="Speech engine"><span id="engineTxt">…</span></button>
+    <button type="button" id="openSet" class="icon" aria-label="Settings"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
+  </div>
+</header>
+
+<main id="main">
+  <section class="view" id="v-counter" aria-label="Counter">
+    <div class="counter">
+      <div class="voice-col">
+        <div class="station">
+          <div id="langs" class="langs" role="group" aria-label="Language"></div>
+          <button type="button" id="mic" aria-label="Tap to speak"><span class="ring"></span><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2.5" width="6" height="12" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3.5"/></svg></button>
+          <div class="wave" id="wave" aria-hidden="true"></div>
+          <p id="micState" class="mic-state">Tap to speak</p>
+          <div id="live" class="live" aria-live="polite"></div>
+          <button type="button" id="agentBtn" class="agent-btn" hidden><span class="ag-dot"></span><span id="agentTxt">Talk to agent</span></button>
+        </div>
+        <form id="typeForm" class="type">
+          <label for="cmd" class="sr">Type a command</label>
+          <input id="cmd" autocomplete="off" placeholder="Type a command">
+          <button type="submit" aria-label="Run"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+        </form>
+        <div class="demo"><span class="eyebrow">Demo</span><div id="examples" class="chips"></div></div>
+      </div>
+      <div class="slip-col"><div id="slip" class="slip" aria-live="polite"></div></div>
+    </div>
+  </section>
+
+  <section class="view" id="v-stock" aria-label="Stock" hidden>
+    <div class="page-head">
+      <h1>Stock</h1>
+      <div class="tools">
+        <input id="invSearch" type="search" placeholder="Search" autocomplete="off" aria-label="Search stock">
+        <select id="invSort" aria-label="Sort"><option value="expiry">Expiry first</option><option value="value">Stock value</option><option value="rack">Rack</option><option value="name">Name</option></select>
+      </div>
+    </div>
+    <div id="stockStats" class="stats" role="group" aria-label="Filter by stock level"></div>
+    <div class="exp-bar"><span class="eyebrow">Expires within</span><div id="expWin" class="seg" role="group" aria-label="Expiry window"></div><span id="expSum" class="exp-sum"></span></div>
+    <div id="stockBody" class="panel"></div>
+  </section>
+
+  <section class="view" id="v-bills" aria-label="Bills" hidden>
+    <div class="page-head"><h1>Bills</h1><span id="billsSub" class="sub"></span></div>
+    <div class="bills-grid"><div id="billsBody" class="panel"></div><div class="slip-col"><div id="billSlip" class="slip"></div></div></div>
+  </section>
+
+  <section class="view" id="v-insights" aria-label="Insights" hidden>
+    <div class="page-head"><h1>Dashboard</h1><div id="period" class="seg" role="group" aria-label="Period"></div></div>
+    <div id="kpis" class="kpis"></div>
+    <div class="ins-grid">
+      <div class="panel"><div class="row-between"><h2>Top sellers</h2><span class="sub" id="topSub"></span></div><div id="topBody"></div></div>
+      <div class="panel"><div class="row-between"><h2>Sell first</h2><span class="sub" id="riskSub"></span></div><div id="riskBody"></div></div>
+      <div class="panel"><h2>Seconds per bill · today</h2><div id="timeChart"></div></div>
+      <div class="panel"><h2>Voice log</h2><div id="logBody"></div></div>
+    </div>
+  </section>
+</main>
+
+<footer class="foot"><span id="dataMode" class="dot"></span><button type="button" class="link" id="resetData">Reset demo</button></footer>
+
+<div class="modal" id="setModal" hidden role="dialog" aria-modal="true" aria-labelledby="setTitle">
+  <div class="sheet">
+    <div class="row-between"><h2 id="setTitle">Settings</h2><button type="button" class="icon" data-close aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+    <p id="voiceNote" class="note" hidden></p>
+    <label class="field" for="setKey">Sarvam API key
+      <span class="keyrow"><input id="setKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk_…"><button type="button" class="btn sm" id="setShow">Show</button></span>
+    </label>
+    <p id="keyStatus" class="sub"></p>
+    <details class="agent-set" id="agentSet">
+      <summary>Voice agent (Samvaad)</summary>
+      <label class="field" for="agKey">Agent API key<input id="agKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk_samvaad_…"></label>
+      <label class="field" for="agApp">Agent ID<input id="agApp" autocomplete="off" spellcheck="false" placeholder="App / agent ID"></label>
+      <div class="two"><label class="field" for="agOrg">Org ID<input id="agOrg" autocomplete="off" spellcheck="false"></label><label class="field" for="agWs">Workspace ID<input id="agWs" autocomplete="off" spellcheck="false"></label></div>
+      <p class="sub" id="agStatus"></p>
+    </details>
+    <label class="check"><input type="checkbox" id="setVoice"><span>Use Sarvam for speech</span></label>
+    <label class="check"><input type="checkbox" id="setSpeak"><span>Speak replies</span></label>
+    <label class="check"><input type="checkbox" id="setPrint"><span>Print on confirm</span></label>
+    <div class="row-between"><button type="button" class="btn" id="setTest">Test key</button><button type="button" class="btn primary" id="setSave">Save</button></div>
+  </div>
+</div>
+
+<div id="printArea"></div>
+<div id="toast" class="toast" role="status"></div>
+<!--APP-END-->
+<script src="vendor/sarvam-agent.js"></script>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
